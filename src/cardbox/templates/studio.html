@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cardbox studio</title>
+<style>
+  :root { --bg:#07080C; --card:#10131B; --line:rgba(255,255,255,0.09); --text:#F5F5F7; --mute:#9A9AA6; --accent:#7CB0FF; --good:#34D399; --bad:#FF6B6B; }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; background:radial-gradient(900px 600px at 15% 0%, rgba(76,141,255,0.18), transparent 60%), var(--bg);
+    color:var(--text); font:16px/1.5 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; display:flex; justify-content:center; padding:48px 16px; }
+  main { width:100%; max-width:680px; }
+  h1 { font-size:22px; letter-spacing:-0.02em; margin:0 0 4px; }
+  .sub { color:var(--mute); margin:0 0 28px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:28px; }
+  .step { color:var(--mute); font-size:13px; letter-spacing:0.08em; text-transform:uppercase; }
+  .prompt { font-size:28px; line-height:1.3; letter-spacing:-0.02em; margin:12px 0 24px; min-height:110px; }
+  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  button { font:inherit; border:0; border-radius:999px; padding:12px 22px; cursor:pointer; min-height:44px; }
+  .rec { background:var(--bad); color:#fff; font-weight:600; }
+  .rec.on { animation:pulse 1.2s infinite; }
+  .ghost { background:transparent; color:var(--text); border:1px solid var(--line); }
+  button:disabled { opacity:0.4; cursor:default; }
+  @keyframes pulse { 50% { box-shadow:0 0 0 10px rgba(255,107,107,0.15); } }
+  meter { width:100%; height:8px; margin:18px 0 6px; }
+  .meter { height:8px; border-radius:4px; background:var(--line); overflow:hidden; margin:20px 0 4px; }
+  .meter i { display:block; height:100%; width:0; background:linear-gradient(90deg, var(--good), var(--accent)); transition:width 60ms; }
+  .result { margin-top:16px; min-height:24px; }
+  .good { color:var(--good); } .bad { color:var(--bad); }
+  .dots { display:flex; gap:6px; margin-top:24px; }
+  .dots span { width:10px; height:10px; border-radius:50%; background:var(--line); }
+  .dots span.done { background:var(--good); } .dots span.cur { outline:2px solid var(--accent); outline-offset:2px; }
+  .consent { display:flex; gap:10px; align-items:flex-start; margin-bottom:20px; color:var(--mute); }
+  .tips { color:var(--mute); font-size:14px; margin-top:24px; }
+  audio { width:100%; margin-top:12px; }
+  @media (prefers-reduced-motion: reduce) { .rec.on { animation:none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Record your voice</h1>
+  <p class="sub">Read each line the way you'd say it in a video. About a minute in total. Recordings stay on this computer.</p>
+  <div class="card">
+    <label class="consent" id="consentRow"><input type="checkbox" id="agree"> <span>I'm recording my own voice and I agree to it being cloned for videos I make.</span></label>
+    <div class="step" id="step"></div>
+    <div class="prompt" id="prompt"></div>
+    <div class="row">
+      <button class="rec" id="rec" aria-label="Record">● Record</button>
+      <button class="ghost" id="prev" aria-label="Previous prompt">← Back</button>
+      <button class="ghost" id="next" aria-label="Next prompt">Next →</button>
+    </div>
+    <div class="meter" aria-hidden="true"><i id="level"></i></div>
+    <audio id="play" controls hidden></audio>
+    <div class="result" id="result" role="status" aria-live="polite"></div>
+    <div class="dots" id="dots"></div>
+  </div>
+  <p class="tips">Tips: a quiet room with soft furnishings, phone or laptop mic about a hand's width away, normal speaking pace. Re-record any line by pressing Record again.</p>
+</main>
+<script>
+const DATA = __DATA__;
+let i = 0, status = null, rec = null, chunks = [], stream = null, raf = 0;
+const $ = (id) => document.getElementById(id);
+
+async function refresh() {
+  status = await (await fetch('/status')).json();
+  $('agree').checked = status.consent; $('consentRow').hidden = status.consent && i > 0;
+  $('step').textContent = i === 0 ? 'Consent · line 1 of ' + DATA.prompts.length : 'Line ' + (i + 1) + ' of ' + DATA.prompts.length;
+  $('prompt').textContent = DATA.prompts[i];
+  $('dots').innerHTML = DATA.prompts.map((_, k) => '<span class="' + (status.takes[String(k).padStart(2, '0')] ? 'done' : '') + (k === i ? ' cur' : '') + '"></span>').join('');
+  const has = status.takes[String(i).padStart(2, '0')];
+  $('play').hidden = !has; if (has) $('play').src = '/take/' + String(i).padStart(2, '0') + '.wav?' + Date.now();
+  $('rec').disabled = i === 0 ? !$('agree').checked : !status.consent;
+  $('prev').disabled = i === 0; $('next').disabled = i === DATA.prompts.length - 1;
+  if (status.ready && !$('result').dataset.locked) $('result').innerHTML = '<span class="good">✓ Enough to clone your voice (' + status.recorded + ' lines). More lines make it sound more like you.</span>';
+}
+
+function meter() {
+  const ctx = new AudioContext(), src = ctx.createMediaStreamSource(stream), an = ctx.createAnalyser(); an.fftSize = 1024; src.connect(an);
+  const buf = new Float32Array(an.fftSize);
+  const tick = () => { an.getFloatTimeDomainData(buf); let p = 0; for (const v of buf) p = Math.max(p, Math.abs(v));
+    $('level').style.width = Math.min(100, p * 140) + '%'; raf = requestAnimationFrame(tick); };
+  tick(); return ctx;
+}
+
+$('rec').onclick = async () => {
+  if (rec && rec.state === 'recording') { rec.stop(); return; }
+  stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+  const ctx = meter(); chunks = [];
+  rec = new MediaRecorder(stream); rec.ondataavailable = (e) => chunks.push(e.data);
+  rec.onstop = async () => {
+    cancelAnimationFrame(raf); ctx.close(); stream.getTracks().forEach((t) => t.stop()); $('level').style.width = '0';
+    $('rec').classList.remove('on'); $('rec').textContent = '● Record'; $('result').textContent = 'Checking…';
+    const r = await (await fetch('/take/' + i, { method: 'POST', body: new Blob(chunks, { type: rec.mimeType }) })).json();
+    $('result').dataset.locked = '1';
+    $('result').innerHTML = r.error ? '<span class="bad">' + r.error + '</span>' : r.ok
+      ? '<span class="good">✓ Sounds good (' + r.seconds + 's)</span>' : '<span class="bad">Try again: ' + r.issues.join('; ') + '</span>';
+    if (r.ok && i < DATA.prompts.length - 1) i++;
+    await refresh(); setTimeout(() => delete $('result').dataset.locked, 2500);
+  };
+  rec.start(); $('rec').classList.add('on'); $('rec').textContent = '■ Stop'; $('result').textContent = 'Recording… press Stop when you finish the line.';
+};
+$('agree').onchange = refresh;
+$('prev').onclick = () => { i = Math.max(0, i - 1); refresh(); };
+$('next').onclick = () => { i = Math.min(DATA.prompts.length - 1, i + 1); refresh(); };
+refresh().then(() => { if (status.next_prompt !== null && status.consent) { i = status.next_prompt; refresh(); } });
+</script>
+</body>
+</html>

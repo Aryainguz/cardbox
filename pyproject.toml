@@ -1,0 +1,54 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cardbox"
+version = "0.1.0"
+description = "Write a script, get a narrated, captioned, animated short video in your own cloned voice. Ships an MCP server so any AI assistant can make them."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+keywords = ["video", "reels", "shorts", "tiktok", "mcp", "tts", "voice-cloning", "captions", "ffmpeg"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Multimedia :: Video",
+  "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+dependencies = [
+  "mcp>=2.0",
+  "pydantic>=2.6",
+  "pyyaml>=6.0",
+  "playwright>=1.44",
+  "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+# The voice stack is heavy (PyTorch). It can live in this environment or in a separate one that
+# cardbox calls through CARDBOX_VOICE_PYTHON.
+voice = ["chatterbox-tts>=0.1.2", "openai-whisper>=20240930"]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+cardbox = "cardbox.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/aryainguz/cardbox"
+Issues = "https://github.com/aryainguz/cardbox/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cardbox"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B905"]  # zips here pair lists built to the same length
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

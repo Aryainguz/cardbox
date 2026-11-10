@@ -1,0 +1,31 @@
+# A cardbox spec. Each beat = one thing on screen + one spoken line (`say`).
+# Render with: cardbox render <name>      Preview a frame: cardbox preview <name> 1
+title: My first reel
+handle: "@yourname"
+theme: midnight        # midnight | ember | forest | mono
+voice: system          # your recorded voice name (cardbox voice record), system, or none
+caption: A one-line hook for the post caption, then a little context.
+hashtags: [tech, explained]
+
+beats:
+  - kind: hook
+    eyebrow: Did you know
+    text: Your phone forgets nothing.
+    say: Your phone remembers every Wi-Fi network you've ever joined. Here's why that matters.
+
+  - kind: scene
+    scene: counter
+    head: Networks remembered
+    say: The average phone has saved dozens of networks, and it keeps calling out for them.
+    params: {to: 37, label: saved networks, on: dozens}
+
+  - kind: list
+    head: What to do
+    items:
+      - {icon: wifi-off, text: Forget old networks}
+      - {icon: shield-check, text: Turn off auto-join}
+    say: Forget the ones you don't use, and turn off auto-join for public Wi-Fi.
+
+  - kind: end
+    text: Follow for more
+    say: Follow for more tech, explained simply.
