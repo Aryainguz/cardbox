@@ -1,0 +1,56 @@
+title: I didn't make this video
+format: square
+handle: "@inguzdev"
+theme: neon
+voice: inguz
+music: upbeat
+caption: >-
+  I didn't record this voice. My AI assistant wrote the script, cloned my voice and rendered the whole video.
+  It's free and open source: cardbox, link in bio.
+hashtags: [ai, opensource, mcp, voiceclone, devtools]
+beats:
+  - kind: hook
+    eyebrow: Made with AI. All of it.
+    text: I didn't make this video.
+    say: I didn't make this video. AI did. Even this voice. Don't believe me? Keep watching.
+  - kind: scene
+    scene: terminal
+    head: One request
+    say: I asked my AI assistant for a video. It wrote the script, picked the visuals, and rendered this.
+    params:
+      title: assistant
+      lines:
+        - {text: make a 30 second video about cardbox, on: asked}
+        - {text: "✓ script written", output: true, on: script}
+        - {text: "✓ visuals picked", output: true, on: visuals}
+        - {text: "✓ rendered in your voice", output: true, on: rendered}
+  - kind: text
+    icon: mic
+    text: Ten lines. One minute.
+    sub: That's all it took to clone my voice.
+    say: To clone my voice, I read ten short lines out loud. About one minute.
+  - kind: scene
+    scene: flow
+    head: It checks its own voice
+    say: Every line it speaks, it listens back to, and re-records anything that comes out wrong.
+    params:
+      nodes:
+        - {icon: audio-lines, label: Speak the line, sub: in the cloned voice, on: speaks}
+        - {icon: ear, label: Listen back, sub: speech recognition, on: listens}
+        - {icon: rotate-ccw, label: Retry if a word is off, sub: until it matches the script, on: re-records}
+  - kind: list
+    head: Same script, any format
+    items:
+      - {icon: smartphone, text: "Reels, Shorts, TikTok"}
+      - {icon: monitor, text: YouTube}
+      - {icon: square, text: LinkedIn feed}
+    say: Same script, any format. Reels, YouTube, LinkedIn.
+  - kind: text
+    icon: plug
+    text: Works with any AI.
+    sub: Free and open source.
+    say: It plugs into any AI assistant through MCP. And it's completely free and open source.
+    pronounce: It plugs into any AI assistant through M C P. And it's completely free and open source.
+  - kind: end
+    text: Star cardbox on GitHub
+    say: It's called cardbox. Link in bio. Star it if this fooled you.

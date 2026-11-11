@@ -1,0 +1,30 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests
+      - run: pytest -q
+      - name: render the example (silent voice)
+        run: |
+          python -m playwright install --with-deps chromium
+          sed -i 's/^voice: system/voice: none/' examples/hash-table/reel.yaml
+          cardbox render examples/hash-table/reel.yaml
+          ffprobe -v error -show_entries format=duration examples/hash-table/hash-table.mp4
+
+  go:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: server } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.22" }
+      - run: go vet ./...
+      - run: go test -race ./...

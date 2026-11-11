@@ -1,0 +1,11 @@
+services:
+  cardbox:
+    build: .
+    ports: ["8080:8080"]
+    volumes: ["cardbox-data:/data"]
+    environment:
+      CARDBOX_WORKERS: "2"
+      # CARDBOX_API_KEYS: "change-me:me"
+      # CARDBOX_WEBHOOK_SECRET: "change-me"
+volumes:
+  cardbox-data:

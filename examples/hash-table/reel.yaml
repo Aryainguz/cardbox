@@ -1,0 +1,56 @@
+title: How a hash table finds anything instantly
+handle: "@cardbox"
+theme: midnight
+voice: system
+caption: How does your phone find one contact out of thousands, instantly? One trick, used everywhere in software.
+hashtags: [hashtable, datastructures, programming, computerscience, techexplained]
+
+beats:
+  - kind: hook
+    eyebrow: Data structures in 60 seconds
+    text: One step. Any size.
+    say: Your phone finds one contact out of ten thousand in a single step. Not ten thousand steps. One.
+
+  - kind: scene
+    scene: bars
+    head: Searching one by one
+    say: Checking names one by one gets slower as your list grows. A million names, a million checks.
+    params:
+      bars:
+        - {label: 100 contacts, value: 100, note: 100 checks}
+        - {label: "10,000 contacts", value: 10000, note: "10,000 checks", on: grows}
+        - {label: "1 million contacts", value: 1000000, note: "1,000,000 checks", on: million}
+
+  - kind: scene
+    scene: flow
+    head: The trick
+    say: A hash function turns a name into a number. That number is the exact shelf where the contact lives.
+    params:
+      nodes:
+        - {icon: user, label: '"Priya"', sub: the key}
+        - {icon: hash, label: hash("Priya") = 42, sub: always the same number, on: number}
+        - {icon: archive, label: Shelf 42, sub: go straight there, on: shelf}
+
+  - kind: scene
+    scene: counter
+    head: So the lookup is
+    say: So finding Priya takes one step, whether you have ten contacts or ten million.
+    params: {to: 1, label: step, on: one, seconds: 0.6}
+
+  - kind: text
+    text: Two names, one shelf?
+    sub: That's a collision.
+    icon: git-merge
+    say: And if two names land on the same shelf? That's a collision. The shelf just keeps a short list.
+
+  - kind: list
+    head: You use them every day
+    items:
+      - {icon: book-user, text: Your contacts}
+      - {icon: database, text: Database indexes}
+      - {icon: globe, text: DNS caches}
+    say: Contacts, database indexes, and the cache that turns website names into addresses all work this way.
+
+  - kind: end
+    text: Follow for more
+    say: Follow for more computer science, explained simply.
