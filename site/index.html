@@ -65,6 +65,9 @@
   .step .n { font: 600 13px ui-monospace, Menlo, monospace; color: var(--a2); }
   .step h3 { margin: 8px 0 6px; font-size: 21px; letter-spacing: -0.02em; }
   .step p { margin: 0; color: var(--mute); font-size: 16px; }
+  /* Grid children default to min-width:auto, which lets wide code blocks push columns off-screen. */
+  .steps > *, .split > *, .features > *, .formats > *, .hero .wrap > * { min-width: 0; }
+  pre { max-width: 100%; }
   pre { margin: 18px 0 0; background: #0A0A10; border: 1px solid var(--line); border-radius: 14px; padding: 16px; overflow-x: auto; font: 13.5px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; color: #DADAE3; }
   .k { color: var(--a3); } .s { color: #9BE7B8; } .c { color: #6E6E80; }
 
