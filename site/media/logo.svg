@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="g" x1="8" y1="6" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFB547"/><stop offset="0.5" stop-color="#FF6B5B"/><stop offset="1" stop-color="#8B7CFF"/>
+    </linearGradient>
+  </defs>
+  <!-- an isometric box: top, left and right faces -->
+  <path d="M32 6 56 19 32 32 8 19Z" fill="url(#g)" opacity="0.95"/>
+  <path d="M8 19 32 32v26L8 45Z" fill="url(#g)" opacity="0.55"/>
+  <path d="M56 19 32 32v26l24-13Z" fill="url(#g)" opacity="0.8"/>
+  <!-- a play mark on the right face -->
+  <path d="M40 34.5v12.5l9-6.9Z" fill="#0A0A0F" opacity="0.85"/>
+</svg>
