@@ -109,8 +109,8 @@ def _body(b: Beat, step: int, reel: Reel) -> str:
     if isinstance(b, Stat):
         icon = f'<div style="margin-bottom:6px">{_tile(b.icon, round(120 * s))}</div>' if b.icon else ""
         big = round((220 if len(b.value) <= 5 else 170) * s)
-        return (f'{icon}<div class="h grad" style="font-size:{big}px">{_esc(b.value)}</div>'
-                f'<div class="sub" style="font-size:{round(52 * s)}px">{_esc(b.label)}</div>')
+        label = f'<div class="sub" style="font-size:{round(52 * s)}px">{_esc(b.label)}</div>' if b.label else ""
+        return f'{icon}<div class="h grad" style="font-size:{big}px">{_esc(b.value)}</div>{label}'
     if isinstance(b, ListBeat):
         head = f'<div class="head" style="font-size:{round(72 * s)}px">{_esc(b.head)}</div>' if b.head else ""
         rows = []

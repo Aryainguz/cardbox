@@ -79,7 +79,8 @@ Writing rules that make reels work:
 - Every number must be true and sourced. Say numbers the way you'd speak them ("twenty ten").
 - End with a reason to comment or follow.
 
-Workflow: create_reel → preview_beat (look at a few frames) → fix → render_reel.
+Workflow: make_video (plain text, quickest) or create_reel (full spec) → preview_beat (look at a few frames)
+→ fix → render_reel. Upgrade plain beats to animated scenes where a picture explains it better.
 Use search_images + add_image for real photos (only reusable licenses; credits are added for you).
 For the user's own voice: voice_status, then voice_record (they read ~10 short lines in a browser page).
 """
@@ -128,6 +129,24 @@ def create_reel(name: str, spec_yaml: str) -> str:
 
 
 @mcp.tool()
+def make_video(name: str, script: str, format: str = "vertical", theme: str = "midnight", voice: str = "default") -> str:
+    """Creates a video from a plain-text script: one paragraph per beat, the first is the hook, the last is the
+    closing card. A line starting with '# ' sets a beat's on-screen headline; '# 8.8% of the music' makes a stat card.
+    Easiest way to start; refine afterwards with get_reel/create_reel (scenes, images, timing)."""
+    from .script import from_text
+
+    try:
+        reel = from_text(script, format=format, theme=theme, voice=voice)
+    except (ValueError, ValidationError) as e:
+        return f"Couldn't build the video: {e}"
+    d = reel_dir(name)
+    (d / "reel.yaml").write_text(spec.dump(reel), encoding="utf-8")
+    return (f"Saved '{slug(name)}' with {len(reel.beats)} beats. Headlines: "
+            + " | ".join(getattr(b, "text", getattr(b, "value", "")) for b in reel.beats)
+            + "\nNext: preview_beat, or upgrade beats to animated scenes with create_reel, then render_reel.")
+
+
+@mcp.tool()
 def get_reel(name: str) -> str:
     """The current spec of a reel, as YAML."""
     path, _ = resolve_reel(name)
@@ -155,7 +174,7 @@ def preview_beat(name: str, beat: int, at: float = 0.7) -> Image:
 def render_reel(name: str) -> str:
     """Renders the reel to MP4 (1080x1920, 30 fps) and writes caption.txt. Takes a few minutes."""
     r = render(name)
-    weak = [i for i, s in enumerate(r.voice_scores) if s is not None and s < 0.9]
+    weak = [i for i, s in enumerate(r.voice_scores) if s is not None and s < 0.97]
     note = f"\nLines where the voice may be off (re-word or add `pronounce`): {weak}" if weak else ""
     return (f"Video: {r.video}\nLength: {r.seconds:.1f}s\nCaption file: {r.caption}\n\n"
             f"{r.caption.read_text(encoding='utf-8')}{note}")

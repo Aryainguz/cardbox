@@ -86,7 +86,9 @@ def run(spec: dict) -> list[dict]:
                 best = {"file": tmp, "score": score, "seed": seed, "heard": heard, "text": heard_text, "attempts": attempt + 1}
             elif tmp != out:
                 os.remove(tmp)
-            if score >= spec.get("min_score", 0.9):
+            # One wrong word in a ten-word line already scores ~0.9 and can flip the meaning
+            # ("AI did" → "yeah I did"), so anything short of a near-exact match is retried.
+            if score >= spec.get("min_score", 0.97):
                 break
         assert best is not None
         if best["file"] != out:

@@ -33,7 +33,27 @@ https://github.com/aryainguz/cardbox/raw/main/site/media/promo-vertical.mp4
 
 ## Why cardbox
 
-Making a short explainer video by hand means scripting, recording, re-recording the line you fluffed, cutting, captioning, animating and syncing it all. cardbox does all of that from a text file:
+Making a short explainer video by hand means scripting, recording, re-recording the line you fluffed, cutting, captioning, animating and syncing it all. With cardbox you either **ask your AI assistant** for the video, or **write what you want to say**:
+
+```text
+One step. Any size. Your phone finds one contact out of ten thousand in a single step.
+
+# 1 million checks
+Searching names one by one gets slower as your list grows.
+
+# 1 step, at any size
+A hash table turns a name into the exact shelf where it lives.
+
+Follow for more computer science, explained simply.
+```
+
+```bash
+cardbox make script.txt --format vertical --voice me --render     # → script.mp4 + caption.txt
+```
+
+Each paragraph becomes one beat. The first is the hook, the last is the closing card, a `# headline` sets what's on screen, and a headline that starts with a number becomes a big stat card.
+
+Want full control (animated scenes, images, word-timed animations)? The same video as a spec:
 
 ```yaml
 title: How a hash table finds anything instantly
@@ -52,10 +72,6 @@ beats:
   - kind: end
     text: Follow for more
     say: Follow for more computer science, explained simply.
-```
-
-```bash
-cardbox render hash-table      # → hash-table.mp4 + caption.txt
 ```
 
 ## What makes it different
@@ -78,9 +94,13 @@ pip install cardbox
 python -m playwright install chromium   # skip if Google Chrome is installed
 cardbox doctor                          # checks ffmpeg, the browser and voice support
 
-cardbox new my-first-video              # creates ~/Cardbox/reels/my-first-video/reel.yaml
+cardbox make "Hello world. This is my first video.
+
+Follow for more." --name hello --render  # plain text straight to video
+
+cardbox new my-first-video              # or a full spec: ~/Cardbox/reels/my-first-video/reel.yaml
 cardbox preview my-first-video 1        # a PNG of beat 1, in a couple of seconds
-cardbox render my-first-video           # the full video
+cardbox render my-first-video
 ```
 
 The template uses the operating system's voice, so it works with no extra installs. To narrate in **your** voice:
@@ -113,6 +133,7 @@ Then just ask: *"Make a 40-second vertical video explaining how DNS works, in my
 
 | Tool | What it does |
 | --- | --- |
+| `make_video` | Plain-text script in, video spec out: the quickest start |
 | `guide` | How to write a good video: spec format, scenes, writing rules |
 | `create_reel` / `get_reel` / `list_reels` | Save and read specs (validation errors come back in plain English) |
 | `preview_beat` | Returns a **frame image** so the assistant can see its work before rendering |

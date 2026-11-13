@@ -1,6 +1,7 @@
 """cardbox command line.
 
-    cardbox new my-reel                 start a reel from the template
+    cardbox make script.txt --render      plain text in (one paragraph per beat), video out
+    cardbox new my-reel                 start a YAML spec from the template (full control)
     cardbox render my-reel              render it (or a path to a spec file)
     cardbox preview my-reel 2           a still of beat 2
     cardbox voice record [name]         record your voice in the browser studio
@@ -36,6 +37,29 @@ def _new(a: argparse.Namespace) -> None:
         sys.exit(f"{dest} already exists (use --force to overwrite)")
     shutil.copy(TEMPLATE, dest)
     print(f"Created {dest}\nEdit it, then: cardbox render {a.name}")
+
+
+def _make(a: argparse.Namespace) -> None:
+    from . import spec
+    from .script import from_text
+    from .workspace import reel_dir, slug
+
+    src = Path(a.script)
+    text = sys.stdin.read() if a.script == "-" else src.read_text(encoding="utf-8") if src.exists() else a.script
+    name = a.name or (src.stem if src.exists() else "video")
+    opts = {k: v for k, v in {"format": a.format, "theme": a.theme, "voice": a.voice, "handle": a.handle,
+                              "music": a.music, "captions": a.captions}.items() if v}
+    reel = from_text(text, **opts)
+    dest = reel_dir(name) / "reel.yaml"
+    dest.write_text(spec.dump(reel), encoding="utf-8")
+    print(f"{len(reel.beats)} beats → {dest}")
+    if a.render:
+        from .render import render
+
+        r = render(slug(name))
+        print(f"\n{r.video}  ({r.seconds:.1f}s)\ncaption: {r.caption}")
+    else:
+        print(f"Preview: cardbox preview {slug(name)} 0    Render: cardbox render {slug(name)}")
 
 
 def _render(a: argparse.Namespace) -> None:
@@ -130,7 +154,19 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--version", action="version", version=f"cardbox {__version__}")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
-    p = sub.add_parser("new", help="start a reel from the template")
+    p = sub.add_parser("make", help="plain-text script (a file, '-' for stdin, or the text itself) → video")
+    p.add_argument("script")
+    p.add_argument("--name")
+    p.add_argument("--format", help="vertical | landscape | square")
+    p.add_argument("--theme")
+    p.add_argument("--voice", help="your voice name, system, or none")
+    p.add_argument("--handle")
+    p.add_argument("--music")
+    p.add_argument("--captions")
+    p.add_argument("--render", action="store_true", help="render right away")
+    p.set_defaults(fn=_make)
+
+    p = sub.add_parser("new", help="start a YAML spec from the template (full control)")
     p.add_argument("name")
     p.add_argument("--force", action="store_true")
     p.set_defaults(fn=_new)

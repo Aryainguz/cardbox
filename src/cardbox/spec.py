@@ -53,7 +53,7 @@ class Text(_Spoken):
 class Stat(_Spoken):
     kind: Literal["stat"] = "stat"
     value: str
-    label: str
+    label: str = ""
     icon: str = ""
 
 

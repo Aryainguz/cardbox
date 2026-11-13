@@ -13,6 +13,7 @@ beats:
     eyebrow: Made with AI. All of it.
     text: I didn't make this video.
     say: I didn't make this video. AI did. Even this voice. Don't believe me? Keep watching.
+    pronounce: I didn't make this video. A I did. Even this voice. Don't believe me? Keep watching.
   - kind: scene
     scene: terminal
     head: One request
