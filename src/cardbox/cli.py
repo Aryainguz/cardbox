@@ -1,5 +1,7 @@
 """cardbox command line.
 
+    cardbox                               open the app in your browser (the easiest way)
+
     cardbox make script.txt --render      plain text in (one paragraph per beat), video out
     cardbox new my-reel                 start a YAML spec from the template (full control)
     cardbox render my-reel              render it (or a path to a spec file)
@@ -49,8 +51,11 @@ def _make(a: argparse.Namespace) -> None:
     name = a.name or (src.stem if src.exists() else "video")
     opts = {k: v for k, v in {"format": a.format, "theme": a.theme, "voice": a.voice, "handle": a.handle,
                               "music": a.music, "captions": a.captions}.items() if v}
-    reel = from_text(text, **opts)
-    dest = reel_dir(name) / "reel.yaml"
+    d = reel_dir(name)
+    if src.exists() and (src.parent / "media").is_dir():  # media next to the script comes along
+        shutil.copytree(src.parent / "media", d / "media", dirs_exist_ok=True)
+    reel = from_text(text, media_dir=d / "media", **opts)
+    dest = d / "reel.yaml"
     dest.write_text(spec.dump(reel), encoding="utf-8")
     print(f"{len(reel.beats)} beats → {dest}")
     if a.render:
@@ -143,6 +148,12 @@ def _doctor(_: argparse.Namespace) -> None:
     sys.exit(0 if ok else 1)
 
 
+def _app(a: argparse.Namespace) -> None:
+    from .app import serve
+
+    serve(port=getattr(a, "port", 8740), open_browser=not getattr(a, "no_browser", False))
+
+
 def _mcp(_: argparse.Namespace) -> None:
     from .mcp_server import main
 
@@ -152,7 +163,12 @@ def _mcp(_: argparse.Namespace) -> None:
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(prog="cardbox", description="Script in, narrated short video out.")
     ap.add_argument("--version", action="version", version=f"cardbox {__version__}")
-    sub = ap.add_subparsers(dest="cmd", required=True)
+    sub = ap.add_subparsers(dest="cmd")
+
+    p = sub.add_parser("app", help="open the cardbox app in your browser (also what plain `cardbox` does)")
+    p.add_argument("--port", type=int, default=8740)
+    p.add_argument("--no-browser", action="store_true")
+    p.set_defaults(fn=_app)
 
     p = sub.add_parser("make", help="plain-text script (a file, '-' for stdin, or the text itself) → video")
     p.add_argument("script")
@@ -200,6 +216,8 @@ def main(argv: list[str] | None = None) -> None:
     sub.add_parser("mcp", help="run the MCP server over stdio").set_defaults(fn=_mcp)
 
     a = ap.parse_args(argv)
+    if a.cmd is None:  # plain `cardbox`: the app
+        a.fn = _app
     try:
         a.fn(a)
     except (FileNotFoundError, RuntimeError, ValueError, IndexError) as e:

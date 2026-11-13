@@ -144,3 +144,122 @@ SCENES.grid = (t, p) => film(t, () => {
   }
   if (p.result) pill(p.result.text, 540, oy + rows * cell + 70, C.accent, rise(t, when(p.result.on, 1, 1.2), 0.4), 'center');
 });
+
+// logo: an isometric box assembles itself (top drops in, sides slide in), a play mark pops on, then
+// the name and tagline. params: name, tagline, on
+SCENES.logo = (t, p) => film(t, () => {
+  const t0 = when(p.on, 0, 1), cx = 540, cy = 640, s = 150;
+  const P = (u, v, h) => [cx + (u - v) * 0.866 * s, cy + (u + v) * 0.5 * s - h * s];
+  const face = (pts, color, dy, a) => { if (a <= 0) return; x.globalAlpha = a; x.beginPath();
+    pts.forEach(([u, v, h], i) => { const [px, py] = P(u, v, h); i ? x.lineTo(px, py + dy) : x.moveTo(px, py + dy); });
+    x.closePath(); x.fillStyle = color; x.fill(); x.globalAlpha = 1; };
+  const a1 = rise(t, t0, 0.5), a2 = rise(t, t0 + 0.25, 0.5), a3 = rise(t, t0 + 0.45, 0.5);
+  glow(C.accent, 60 * a3, () => {
+    face([[-1, 1, 0], [1, 1, 0], [1, 1, 1.6], [-1, 1, 1.6]].map(([u, v, h]) => [u * 0.5 - 0.5, v * 0.5 + 0.5, h * 0.62]), C.accent2, (1 - a2) * 120, a2);
+    face([[1, -1, 0], [1, 1, 0], [1, 1, 1.6], [1, -1, 1.6]].map(([u, v, h]) => [u * 0.5 + 0.5, v * 0.5 - 0.5, h * 0.62]), C.accent3, (1 - a2) * 120, a2);
+    face([[-1, -1, 1.6], [1, -1, 1.6], [1, 1, 1.6], [-1, 1, 1.6]].map(([u, v, h]) => [u, v, h * 0.62]), C.accent, -(1 - a1) * 260, a1);
+  });
+  const pa = rise(t, t0 + 0.75, 0.35);
+  if (pa > 0) { const [px, py] = P(1, 0.15, 0.45); x.save(); x.translate(px, py); x.scale(pa, pa);
+    x.beginPath(); x.moveTo(-22, -34); x.lineTo(34, 0); x.lineTo(-22, 34); x.closePath(); x.fillStyle = C.bg; x.fill(); x.restore(); }
+  const na = rise(t, t0 + 1.0, 0.5);
+  if (na > 0) { x.globalAlpha = na; txt(p.name || 'cardbox', 540, 1010 + (1 - na) * 30, fit(p.name || 'cardbox', 900, 150, 800), C.text, 800, 'center');
+    if (p.tagline) txt(p.tagline, 540, 1090, fit(p.tagline, 900, 44, 600), C.mute, 600, 'center'); x.globalAlpha = 1; }
+});
+
+// chat: a conversation with an AI assistant. params: title, messages [{from: user|ai, text, on}]
+SCENES.chat = (t, p) => film(t, () => {
+  const msgs = p.messages || [], X0 = 70, W0 = 940;
+  rrect(X0, 380, W0, 860, 30); x.fillStyle = T.surface; x.fill(); x.strokeStyle = T.line; x.lineWidth = 2; x.stroke();
+  txt(p.title || 'AI assistant', X0 + 36, 440, 30, C.mute, 600);
+  x.fillStyle = T.line; x.fillRect(X0, 470, W0, 2);
+  let y = 520;
+  msgs.forEach((m, i) => {
+    const t0 = when(m.on, i, msgs.length), user = m.from === 'user';
+    if (t < t0 - (user ? 0 : 0.6)) return;
+    const lines = wrap(m.text, 640, 36), bh = lines.length * 48 + 36, bw = Math.max(...lines.map((l) => x.measureText(l).width)) + 56;
+    const bx = user ? X0 + W0 - 36 - bw : X0 + 36, a = rise(t, t0, 0.3);
+    if (!user && t < t0) {  // typing dots before the assistant answers
+      rrect(bx, y, 140, 70, 26); x.fillStyle = LIGHT ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.07)'; x.fill();
+      for (let d = 0; d < 3; d++) { x.globalAlpha = 0.35 + 0.65 * Math.abs(Math.sin(t * 5 + d)); x.beginPath(); x.arc(bx + 42 + d * 28, y + 35, 8, 0, 7); x.fillStyle = C.mute; x.fill(); }
+      x.globalAlpha = 1; return;
+    }
+    x.globalAlpha = a; x.save(); x.translate(0, (1 - a) * 20);
+    rrect(bx, y, bw, bh, 26); x.fillStyle = user ? C.accent : (LIGHT ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.07)'); x.fill();
+    lines.forEach((l, j) => txt(l, bx + 28, y + 56 + j * 48, 36, user ? C.bg : C.text, 600));
+    x.restore(); x.globalAlpha = 1;
+    y += bh + 26;
+  });
+});
+
+// script: a plain-text script whose paragraphs light up one by one, each becoming a video frame.
+// params: title, paragraphs [text...], on
+SCENES.script = (t, p) => film(t, () => {
+  const paras = p.paragraphs || [], n = paras.length;
+  rrect(60, 390, 560, 840, 26); x.fillStyle = T.surface; x.fill(); x.strokeStyle = T.line; x.lineWidth = 2; x.stroke();
+  txt(p.title || 'script.txt', 92, 446, 28, C.mute, 600, 'left', 'Mono');
+  let y = 510;
+  paras.forEach((para, i) => {
+    const t0 = when(Array.isArray(p.on) ? p.on[i] : undefined, i, n), on = t > t0, lines = wrap(para, 480, 28, 400);
+    if (on) { rrect(78, y - 36, 524, lines.length * 40 + 24, 12); x.fillStyle = LIGHT ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.05)'; x.fill(); }
+    lines.forEach((l, j) => txt(l, 96, y + j * 40, 28, on ? C.text : C.mute, 400, 'left', 'Mono'));
+    // the frame this paragraph becomes
+    const a = rise(t, t0 + 0.15, 0.5), fy = 400 + i * (800 / Math.max(n, 1)), fh = Math.min(240, 760 / Math.max(n, 1)) - 20, fw = fh * 0.5625 * 1.9;
+    if (a > 0) {
+      const fx = 690 + (1 - a) * -120;
+      x.globalAlpha = a;
+      glow(C.accent, 26 * a, () => { rrect(fx, fy, fw, fh, 16); x.fillStyle = C.bg; x.fill(); x.strokeStyle = C.accent; x.lineWidth = 3; x.stroke(); });
+      const head = para.split(/[.?!]/)[0].split(' ').slice(0, 4).join(' ');
+      wrap(head, fw - 40, 30, 800).slice(0, 2).forEach((l, j) => txt(l, fx + 20, fy + 52 + j * 36, 30, C.text, 800));
+      rrect(fx + 20, fy + fh - 40, fw - 40, 10, 5); x.fillStyle = C.accent; x.fill();
+      x.globalAlpha = 1;
+      x.strokeStyle = C.accent; x.globalAlpha = a * 0.5; x.lineWidth = 2; x.setLineDash([8, 8]);
+      x.beginPath(); x.moveTo(610, y - 8); x.lineTo(fx, fy + fh / 2); x.stroke(); x.setLineDash([]); x.globalAlpha = 1;
+    }
+    y += lines.length * 40 + 44;
+  });
+});
+
+// voice: a waveform with the transcript appearing word by word; one misheard word is caught, struck
+// out, re-recorded and corrected. params: text, wrong {index, heard}, on
+SCENES.voice = (t, p) => film(t, () => {
+  const words = String(p.text || '').split(/\s+/), t0 = when(p.on, 0, 1), span = CONFIG.voice * 0.45;
+  const wr = p.wrong || {}, fixAt = t0 + span + 0.6, fixed = t > fixAt + 0.5;
+  const live = t > t0 && t < t0 + span ? 1 : (t > fixAt && t < fixAt + 0.5 ? 1 : 0.15);
+  wave(540, 560, 900, 220, t, live);
+  rrect(70, 760, 940, 340, 26); x.fillStyle = T.surface; x.fill(); x.strokeStyle = T.line; x.lineWidth = 2; x.stroke();
+  txt('heard', 104, 816, 28, C.mute, 600);
+  let px = 104, py = 890;
+  words.forEach((w, i) => {
+    const at = t0 + span * (i / words.length); if (t < at) return;
+    const bad = i === wr.index, shown = bad && !fixed ? (wr.heard || w) : w, size = 50;
+    x.font = '700 ' + size + 'px ' + FONT; const ww = x.measureText(shown).width;
+    if (px + ww > 980) { px = 104; py += 70; }
+    const color = bad ? (fixed ? C.green : C.red) : C.text;
+    txt(shown, px, py, size, color, 700);
+    if (bad && !fixed && t > t0 + span + 0.2) { x.strokeStyle = C.red; x.lineWidth = 5; x.beginPath(); x.moveTo(px - 4, py - 16); x.lineTo(px + ww + 4, py - 16); x.stroke(); }
+    px += ww + 18;
+  });
+  if (t > t0 + span + 0.2 && !fixed) pill('↻ re-recording that line', 104, 1190, C.amber, rise(t, t0 + span + 0.2, 0.3));
+  if (fixed) pill('✓ 100% match', 104, 1190, C.green, rise(t, fixAt + 0.5, 0.3));
+});
+
+// formats: one frame morphing between 9:16, 16:9 and 1:1. params: labels [3 strings], on [3 cues]
+SCENES.formats = (t, p) => film(t, () => {
+  const shapes = [[9, 16], [16, 9], [1, 1]], labels = p.labels || ['Reels · Shorts · TikTok', 'YouTube', 'LinkedIn'];
+  const cues = shapes.map((_, i) => when(Array.isArray(p.on) ? p.on[i] : undefined, i, 3));
+  let k = 0; cues.forEach((c, i) => { if (t >= c) k = i; });
+  const prev = shapes[Math.max(0, k - 1)], cur = shapes[k], e = rise(t, cues[k], 0.6), box = 620;
+  const ar = (prev[0] / prev[1]) + ((cur[0] / cur[1]) - (prev[0] / prev[1])) * (k === 0 ? 1 : e);
+  const fw = ar >= 1 ? box * 1.45 : box * ar * 1.25, fh = ar >= 1 ? box * 1.45 / ar : box * 1.25, fx = 540 - fw / 2, fy = 760 - fh / 2;
+  glow(C.accent, 40, () => { rrect(fx, fy, fw, fh, 28); x.fillStyle = C.bg; x.fill(); x.strokeStyle = C.accent; x.lineWidth = 5; x.stroke(); });
+  const land = ar > 1.2;
+  rrect(fx + 36, fy + 40, Math.min(fw * 0.5, 300), 30, 10); x.fillStyle = C.mute; x.globalAlpha = 0.5; x.fill(); x.globalAlpha = 1;
+  rrect(fx + 36, fy + 90, Math.min(fw * (land ? 0.42 : 0.8), 460), 54, 12); x.fillStyle = C.text; x.fill();
+  const cx = land ? fx + fw * 0.72 : fx + fw / 2, cy = land ? fy + fh / 2 + 10 : fy + fh * 0.62, r = Math.min(fw, fh) * 0.2;
+  x.lineWidth = r * 0.35; x.strokeStyle = T.line; x.beginPath(); x.arc(cx, cy, r, 0, 7); x.stroke();
+  glow(C.accent, 20, () => { x.strokeStyle = C.accent; x.beginPath(); x.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (0.3 + 0.6 * ((t * 0.2) % 1))); x.stroke(); });
+  const ratio = cur[0] + ':' + cur[1];
+  txt(ratio, 540, fy + fh + 90, 64, C.accent, 800, 'center');
+  txt(labels[k], 540, fy + fh + 150, 40, C.text, 700, 'center');
+});

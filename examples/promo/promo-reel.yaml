@@ -1,0 +1,38 @@
+title: This isn't my real voice
+format: vertical
+handle: "@inguzdev"
+theme: midnight
+accent: "#FFE14D"
+voice: inguz
+music: upbeat
+caption: >-
+  This isn't my real voice. My AI assistant wrote the script, and the open-source tool I built turned it into this
+  video, in a clone of my voice. Comment REPO and I'll send you the link.
+hashtags: [ai, opensource, voiceclone, mcp, devtools]
+beats:
+  - kind: hook
+    eyebrow: Not a real recording
+    text: This isn't my real voice.
+    say: This isn't my real voice. It's an AI clone. And this whole video came from one sentence.
+    background: {scene: voice, params: {text: "", on: 0}}
+  - kind: scene
+    scene: chat
+    head: One sentence in
+    say: I asked my AI assistant for a video. It wrote the script, and my open-source tool turned it into this.
+    params:
+      messages:
+        - {from: user, text: "Make a 30-second reel about my new tool, in my voice.", on: asked}
+        - {from: ai, text: "Done: reel.mp4 · 30 seconds", on: turned}
+  - kind: scene
+    scene: voice
+    head: It checks itself
+    say: It clones your voice in a minute, and re-records any word it gets wrong.
+    params: {text: Give it a star if this fooled you, wrong: {index: 3, heard: start}, on: clones}
+  - kind: scene
+    scene: formats
+    head: Every platform
+    say: Reels, YouTube, LinkedIn. One script.
+    params: {on: [Reels, YouTube, LinkedIn]}
+  - kind: end
+    text: Comment REPO for the link
+    say: Want it? Comment repo, and I'll send you the link.

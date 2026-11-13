@@ -159,3 +159,15 @@ function photo(t, name, a, b, rect, radius = 28, alpha = 1) {
 
 let FRAME_T = 0;
 window.drawAt = (t) => { FRAME_T = t; SCENES[CONFIG.scene](t, CONFIG.params || {}); };
+
+// Wraps text into lines no wider than maxW at the given size.
+function wrap(s, maxW, size, weight = 600) {
+  x.font = weight + ' ' + size + 'px ' + FONT;
+  const out = []; let line = '';
+  for (const w of String(s).split(/\s+/)) {
+    const test = line ? line + ' ' + w : w;
+    if (x.measureText(test).width > maxW && line) { out.push(line); line = w; } else line = test;
+  }
+  if (line) out.push(line);
+  return out;
+}

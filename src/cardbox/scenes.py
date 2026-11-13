@@ -36,6 +36,11 @@ CATALOG = {
     "terminal": "Commands typing out in a terminal window. params: title, lines [{text,on?,color?,output?}]",
     "flow": "A vertical chain of steps with packets moving between them. params: nodes [{icon,label,sub?,on?,color?}], bad",
     "grid": "k of n icons lighting up (e.g. '1 in 10'). params: n, k, cols, icon, result {text,on}",
+    "logo": "A logo reveal: an isometric box assembles, then a name and tagline. params: name, tagline, on",
+    "chat": "A chat with an AI assistant; typing dots before each answer. params: title, messages [{from: user|ai, text, on}]",
+    "script": "A text script whose paragraphs light up and turn into video frames. params: title, paragraphs [text], on [cues]",
+    "voice": "A waveform and live transcript; one misheard word is caught and corrected. params: text, wrong {index, heard}, on",
+    "formats": "One frame morphing between 9:16, 16:9 and 1:1. params: labels [3 strings], on [3 cues]",
 }
 
 

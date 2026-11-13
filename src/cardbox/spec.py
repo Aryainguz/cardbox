@@ -20,10 +20,12 @@ class _Model(BaseModel):
 
 
 class Background(_Model):
-    """What plays behind a hook or text beat: an animated scene, or an image with a slow push-in."""
+    """What plays behind a hook or text beat: an animated scene, an image with a slow push-in, or a
+    video clip (looped or trimmed to the beat). Paths are relative to the spec's folder."""
 
     scene: str | None = None
     image: str | None = None
+    video: str | None = None
     params: dict[str, Any] = Field(default_factory=dict)
 
 

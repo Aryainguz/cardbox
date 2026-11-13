@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cardbox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0A0A0C; --panel:#131317; --panel2:#1A1A20; --line:#26262E; --text:#F5F5F2; --dim:#A3A3AE; --faint:#6B6B76;
+    --yellow:#FFE14D; --green:#3DDC84; --red:#FF5C5C;
+    --display:"Bricolage Grotesque", Inter, system-ui, sans-serif; --sans:Inter, -apple-system, system-ui, sans-serif; --mono:"JetBrains Mono", ui-monospace, Menlo, monospace; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  .app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+  @media (max-width: 860px) { .app { grid-template-columns: 1fr; } aside { border-right: 0; border-bottom: 1px solid var(--line); } }
+
+  aside { border-right: 1px solid var(--line); padding: 18px 14px; display: flex; flex-direction: column; gap: 14px; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 800 22px var(--display); letter-spacing: -0.03em; padding: 4px 6px; }
+  .brand svg { width: 28px; height: 28px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 2px solid transparent; border-radius: 12px;
+    padding: 10px 16px; min-height: 44px; font-weight: 700; cursor: pointer; background: var(--panel2); border-color: var(--line); }
+  .btn:hover { border-color: #3A3A44; }
+  .btn.y { background: var(--yellow); color: #111; border-color: var(--yellow); box-shadow: 0 4px 0 #B89A12; }
+  .btn.y:active { transform: translateY(2px); box-shadow: 0 2px 0 #B89A12; }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+  .btn.sm { min-height: 34px; padding: 6px 12px; font-size: 13.5px; border-radius: 10px; }
+  .list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+  .item { text-align: left; background: none; border: 0; border-radius: 10px; padding: 9px 10px; cursor: pointer; color: var(--dim); display: flex; gap: 8px; align-items: center; }
+  .item:hover { background: var(--panel); color: var(--text); }
+  .item.on { background: var(--panel2); color: var(--text); }
+  .item i { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); flex: none; }
+  .item i.done { background: var(--green); }
+  .label { font: 600 12px var(--mono); color: var(--faint); text-transform: lowercase; padding: 0 6px; }
+  .voicebox { margin-top: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+  .voicebox b { display: block; margin-bottom: 4px; }
+  .voicebox small { color: var(--dim); display: block; margin-bottom: 10px; }
+
+  main { padding: 24px clamp(16px, 3vw, 40px) 60px; max-width: 1180px; width: 100%; }
+  .top { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+  .title { flex: 1; min-width: 220px; background: none; border: 0; font: 800 34px var(--display); letter-spacing: -0.03em; padding: 4px 0; outline: none; }
+  .title::placeholder { color: var(--faint); }
+  .grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 18px; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 18px; }
+  .card h3 { margin: 0 0 4px; font: 700 17px var(--display); letter-spacing: -0.01em; }
+  .card .hint { color: var(--dim); font-size: 13.5px; margin: 0 0 12px; }
+  .card .hint code { font: 12.5px var(--mono); background: var(--panel2); padding: 1px 5px; border-radius: 5px; color: var(--text); }
+  textarea.script { width: 100%; min-height: 360px; resize: vertical; background: #0D0D10; border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px; font: 14.5px/1.7 var(--mono); outline: none; }
+  textarea:focus, input:focus, select:focus { border-color: var(--yellow) !important; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .field { margin-bottom: 14px; }
+  .field > span { display: block; font: 600 12.5px var(--sans); color: var(--dim); margin-bottom: 6px; }
+  .seg { display: inline-flex; background: #0D0D10; border: 1px solid var(--line); border-radius: 12px; padding: 3px; gap: 3px; flex-wrap: wrap; }
+  .seg button { background: none; border: 0; border-radius: 9px; padding: 7px 12px; cursor: pointer; color: var(--dim); font-weight: 600; font-size: 13.5px; }
+  .seg button.on { background: var(--yellow); color: #111; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sw { width: 38px; height: 38px; border-radius: 10px; border: 2px solid var(--line); cursor: pointer; position: relative; }
+  .sw.on { border-color: var(--yellow); box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--yellow); }
+  select, input[type=text] { background: #0D0D10; border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; min-height: 40px; outline: none; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .drop { border: 2px dashed var(--line); border-radius: 14px; padding: 18px; text-align: center; color: var(--dim); cursor: pointer; transition: border-color .15s; }
+  .drop.over { border-color: var(--yellow); color: var(--text); }
+  .media { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-top: 12px; }
+  .m { position: relative; border-radius: 10px; overflow: hidden; background: #0D0D10; border: 1px solid var(--line); }
+  .m img, .m video { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+  .m span { display: block; font: 11.5px var(--mono); padding: 5px 7px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .m button { position: absolute; top: 5px; right: 5px; width: 26px; height: 26px; border-radius: 8px; border: 0; background: rgba(0,0,0,0.7); cursor: pointer; }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+  .msg { color: var(--dim); font-size: 13.5px; }
+  .msg.err { color: var(--red); }
+  .beats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 14px; }
+  .beat { background: #0D0D10; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .beat img { width: 100%; display: block; background: #0D0D10; min-height: 80px; }
+  .beat div { padding: 7px 9px; font-size: 12.5px; color: var(--dim); }
+  .beat b { color: var(--yellow); font: 600 11px var(--mono); margin-right: 6px; text-transform: uppercase; }
+  .bar { height: 10px; background: #0D0D10; border: 1px solid var(--line); border-radius: 99px; overflow: hidden; margin: 10px 0 6px; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--yellow); transition: width .4s; }
+  .result video { width: 100%; max-height: 70vh; border-radius: 14px; background: #000; display: block; }
+  .result textarea { width: 100%; min-height: 110px; margin-top: 12px; background: #0D0D10; border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: 13.5px; }
+  details { margin-top: 18px; }
+  summary { cursor: pointer; color: var(--dim); font-weight: 600; }
+  details textarea { width: 100%; min-height: 300px; margin-top: 10px; background: #0D0D10; border: 1px solid var(--line); border-radius: 12px; padding: 14px; font: 13px/1.6 var(--mono); }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+  .modal.open { display: flex; }
+  .modal .box { width: min(760px, 100%); height: min(720px, 92vh); background: var(--bg); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
+  .modal header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .modal iframe { flex: 1; border: 0; width: 100%; background: var(--bg); }
+  .empty { color: var(--faint); font-size: 13.5px; padding: 6px; }
+  :focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 56 19 32 32 8 19Z" fill="#FFE14D"/><path d="M8 19 32 32v26L8 45Z" fill="#C9AE2E"/><path d="M56 19 32 32v26l24-13Z" fill="#E6C93C"/><path d="M40 34.5v12.5l9-6.9Z" fill="#0A0A0C"/></svg>
+      cardbox
+    </div>
+    <button class="btn y" id="new">+ New video</button>
+    <div class="label">your videos</div>
+    <div class="list" id="reels"></div>
+    <div class="voicebox" id="voicebox"></div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <input class="title" id="title" placeholder="Untitled video" aria-label="Video title">
+      <button class="btn sm" id="delete" title="Delete this video">Delete</button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>1 · What should it say?</h3>
+        <p class="hint">One paragraph per beat. The first is the hook, the last is the ending. <code># Headline</code> sets what's on screen,
+          <code># 8.8% of the music</code> makes a big number, <code>@ photo.jpg</code> puts one of your files behind that beat.</p>
+        <textarea class="script" id="script" spellcheck="true" aria-label="Script"></textarea>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:18px">
+          <h3>2 · How should it look?</h3>
+          <p class="hint">Change anything, any time. One script works in every format.</p>
+          <div class="field"><span>Format</span><div class="seg" id="format"></div></div>
+          <div class="field"><span>Theme</span><div class="swatches" id="theme"></div></div>
+          <div class="two">
+            <label class="field"><span>Voice</span><select id="voice"></select></label>
+            <label class="field"><span>Music</span><select id="music"></select></label>
+            <label class="field"><span>Captions</span><select id="captions"></select></label>
+            <label class="field"><span>Your handle</span><input type="text" id="handle" placeholder="@you"></label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>3 · Your images &amp; clips <span style="color:var(--faint);font-weight:500">(optional)</span></h3>
+          <p class="hint">Drop files here. Name them <code>1.jpg</code>, <code>2.mp4</code> to use them for beat 1, 2… or write <code>@ name</code> in a paragraph.</p>
+          <div class="drop" id="drop" tabindex="0" role="button" aria-label="Add images or video clips">Drop images or video clips, or click to choose<input type="file" id="files" multiple accept="image/*,video/*" hidden></div>
+          <div class="media" id="media"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="preview">👀 Save &amp; preview</button>
+      <button class="btn y" id="render">🎬 Make the video</button>
+      <span class="msg" id="msg" role="status" aria-live="polite"></span>
+    </div>
+    <div class="bar" id="bar" hidden><i></i></div>
+
+    <div class="beats" id="beats"></div>
+
+    <div class="card result" id="result" hidden style="margin-top:18px">
+      <h3>Your video</h3>
+      <video id="video" controls playsinline></video>
+      <div class="actions"><a class="btn y" id="download" download>⬇ Download</a><button class="btn" id="copy">Copy caption</button></div>
+      <textarea id="caption" readonly aria-label="Post caption"></textarea>
+    </div>
+
+    <details>
+      <summary>Advanced: edit the spec (YAML)</summary>
+      <p class="hint" style="color:var(--dim)">Full control: animated scenes, word-timed animations, backgrounds. Saving the script above rebuilds this.</p>
+      <textarea id="yaml" spellcheck="false" aria-label="YAML spec"></textarea>
+      <div class="actions"><button class="btn sm" id="saveyaml">Save YAML</button></div>
+    </details>
+  </main>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Record your voice">
+  <div class="box"><header><b>Record your voice</b><button class="btn sm" id="close">Done</button></header><iframe id="studio" allow="microphone" title="Voice recording studio"></iframe></div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const api = async (path, opts = {}) => {
+  const r = await fetch(path, opts); const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || r.statusText); return data;
+};
+const EXAMPLE = `Your phone finds one contact out of ten thousand in a single step. Here's the trick.
+
+# 1 million checks
+Searching names one by one gets slower and slower as your list grows.
+
+# The trick: a hash
+A hash function turns a name into a number, the exact shelf where that contact lives.
+
+Follow for more computer science, explained simply.`;
+let S = null, current = null, choice = { format: 'vertical', theme: 'midnight', voice: 'system', music: 'calm', captions: 'highlight', handle: '' };
+let poll = null;
+
+function msg(text, err = false) { $('msg').textContent = text; $('msg').className = 'msg' + (err ? ' err' : ''); }
+
+function renderList() {
+  $('reels').innerHTML = S.reels.length ? '' : '<div class="empty">No videos yet.</div>';
+  for (const r of S.reels) {
+    const b = document.createElement('button'); b.className = 'item' + (r.name === current ? ' on' : '');
+    b.innerHTML = `<i class="${r.rendered ? 'done' : ''}"></i><span></span>`; b.querySelector('span').textContent = r.title;
+    b.onclick = () => open(r.name); $('reels').appendChild(b);
+  }
+  const v = S.voices[0];
+  $('voicebox').innerHTML = v
+    ? `<b>🎙️ Voice: ${v.name}</b><small>${v.ready ? 'Ready to use' : `${v.recorded}/${v.total} lines recorded`}${S.cloning ? '' : ' · install cardbox[voice] to clone'}</small>`
+    : `<b>🎙️ Your voice</b><small>Read 10 short lines (about a minute) and every video can sound like you.</small>`;
+  const rec = document.createElement('button'); rec.className = 'btn sm'; rec.textContent = v ? 'Record more' : 'Record my voice';
+  rec.onclick = () => recordVoice(v ? v.name : 'me'); $('voicebox').appendChild(rec);
+}
+
+function renderOptions() {
+  const O = S.options;
+  $('format').innerHTML = '';
+  for (const f of O.formats) {
+    const b = document.createElement('button'); b.textContent = f.name[0].toUpperCase() + f.name.slice(1); b.title = `${f.size} · ${f.use}`;
+    b.className = choice.format === f.name ? 'on' : ''; b.onclick = () => { choice.format = f.name; renderOptions(); }; $('format').appendChild(b);
+  }
+  $('theme').innerHTML = '';
+  for (const t of O.themes) {
+    const b = document.createElement('button'); b.className = 'sw' + (choice.theme === t.name ? ' on' : ''); b.title = t.name; b.setAttribute('aria-label', 'Theme ' + t.name);
+    b.style.background = `linear-gradient(135deg, ${t.bg} 52%, ${t.accent} 52%)`; b.onclick = () => { choice.theme = t.name; renderOptions(); };
+    $('theme').appendChild(b);
+  }
+  const fill = (id, values, labels = {}) => { $(id).innerHTML = values.map((v) => `<option value="${v}">${labels[v] || v}</option>`).join(''); $(id).value = choice[id]; };
+  const vnames = [...S.voices.filter((v) => v.ready).map((v) => v.name), 'system', 'none'];
+  if (!vnames.includes(choice.voice)) vnames.unshift(choice.voice);
+  fill('voice', vnames, { system: 'Computer voice', none: 'No voice (silent preview)', ...Object.fromEntries(S.voices.map((v) => [v.name, `My voice (${v.name})`])) });
+  fill('music', O.music); fill('captions', O.captions);
+  $('handle').value = choice.handle || '';
+}
+
+function showMedia(list) {
+  $('media').innerHTML = '';
+  for (const m of list) {
+    const d = document.createElement('div'); d.className = 'm';
+    const src = `/files/${current}/media/${encodeURIComponent(m.name)}`;
+    d.innerHTML = m.kind === 'video' ? `<video src="${src}" muted preload="metadata"></video>` : `<img src="${src}" alt="">`;
+    const n = document.createElement('span'); n.textContent = m.name; d.appendChild(n);
+    const x = document.createElement('button'); x.textContent = '✕'; x.title = 'Remove'; x.setAttribute('aria-label', 'Remove ' + m.name);
+    x.onclick = async () => showMedia((await api(`/api/reels/${current}/media/${encodeURIComponent(m.name)}`, { method: 'DELETE' })).media);
+    d.appendChild(x); $('media').appendChild(d);
+  }
+}
+
+function showResult(info) {
+  $('result').hidden = !info.video;
+  if (info.video) { $('video').src = info.video; $('download').href = info.video; $('caption').value = info.caption; }
+}
+
+async function open(name) {
+  current = name; const info = await api(`/api/reels/${name}`);
+  $('title').value = info.title || ''; $('script').value = info.script || '';
+  Object.assign(choice, Object.fromEntries(Object.entries(info.options || {}).filter(([, v]) => v !== null)));
+  $('yaml').value = info.yaml || ''; $('beats').innerHTML = '';
+  showMedia(info.media); showResult(info); renderOptions(); renderList();
+  if (info.job && info.job.state === 'running') watch();
+  msg(info.error ? 'This video\'s spec has an error: ' + info.error : '', !!info.error);
+}
+
+async function newVideo() {
+  const base = 'video-' + new Date().toISOString().slice(5, 16).replace(/[-T:]/g, '');
+  current = base; $('title').value = ''; $('script').value = EXAMPLE; $('yaml').value = ''; $('beats').innerHTML = '';
+  showMedia([]); showResult({}); renderList(); msg('New video. Edit the script, then preview.'); $('script').focus();
+}
+
+async function save() {
+  choice.voice = $('voice').value; choice.music = $('music').value; choice.captions = $('captions').value; choice.handle = $('handle').value.trim();
+  const info = await api(`/api/reels/${current}`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: $('title').value.trim(), script: $('script').value, options: choice }) });
+  $('yaml').value = info.yaml; S = await api('/api/state'); renderList(); return info;
+}
+
+async function preview() {
+  try {
+    msg('Saving…'); const info = await save(); msg(`Drawing ${info.beats.length} frames…`);
+    $('beats').innerHTML = '';
+    const imgs = info.beats.map((b, k) => {
+      const d = document.createElement('div'); d.className = 'beat';
+      d.innerHTML = `<img alt="Preview of beat ${k + 1}"><div><b>${b.kind}</b><span></span></div>`; d.querySelector('span').textContent = b.text;
+      $('beats').appendChild(d); return d.querySelector('img');
+    });
+    for (let k = 0; k < imgs.length; k++) { imgs[k].src = `/api/reels/${current}/preview/${k}?t=${Date.now()}`; await new Promise((r) => { imgs[k].onload = imgs[k].onerror = r; }); }
+    msg('Preview ready. Happy with it? Make the video.');
+  } catch (e) { msg(e.message, true); }
+}
+
+async function render() {
+  try { msg('Saving…'); await save(); await api(`/api/reels/${current}/render`, { method: 'POST' }); watch(); }
+  catch (e) { msg(e.message, true); }
+}
+
+function watch() {
+  $('render').disabled = true; $('bar').hidden = false; clearInterval(poll);
+  const words = { starting: 'Starting', voice: 'Recording the voice', draw: 'Drawing the frames', mix: 'Mixing music and voice', done: 'Done' };
+  poll = setInterval(async () => {
+    const info = await api(`/api/reels/${current}`); const j = info.job; if (!j) return;
+    const pct = j.stage === 'voice' ? 12 : j.stage === 'draw' ? 15 + 75 * (j.done / Math.max(j.total, 1)) : j.stage === 'mix' ? 94 : j.state === 'done' ? 100 : 5;
+    $('bar').firstElementChild.style.width = pct + '%';
+    msg(`${words[j.stage] || j.stage}${j.stage === 'draw' ? ` (${j.done}/${j.total})` : ''}… ${j.elapsed || 0}s`);
+    if (j.state !== 'running') {
+      clearInterval(poll); $('render').disabled = false;
+      if (j.state === 'error') { msg('Something went wrong: ' + j.error, true); $('bar').hidden = true; return; }
+      msg(`Done: ${j.seconds}s of video in ${j.elapsed}s.`); setTimeout(() => ($('bar').hidden = true), 1200);
+      showResult(info); S = await api('/api/state'); renderList(); $('result').scrollIntoView({ behavior: 'smooth' });
+    }
+  }, 1000);
+}
+
+async function upload(files) {
+  if (!current) await newVideo();
+  for (const f of files) {
+    msg(`Adding ${f.name}…`);
+    try { showMedia((await api(`/api/reels/${current}/media?file=${encodeURIComponent(f.name)}`, { method: 'POST', body: f })).media); }
+    catch (e) { msg(e.message, true); return; }
+  }
+  msg('Added. Name files 1.jpg, 2.mp4… or use @ name in the script.');
+}
+
+async function recordVoice(name) {
+  const { url } = await api(`/api/voices/${name}/studio`, { method: 'POST' });
+  $('studio').src = url; $('modal').classList.add('open');
+}
+
+$('new').onclick = newVideo;
+$('preview').onclick = preview;
+$('render').onclick = render;
+$('copy').onclick = () => { navigator.clipboard.writeText($('caption').value); msg('Caption copied.'); };
+$('close').onclick = async () => { $('modal').classList.remove('open'); $('studio').src = 'about:blank'; S = await api('/api/state'); renderList(); renderOptions(); };
+$('delete').onclick = async () => {
+  if (!current || !confirm('Delete this video and its files?')) return;
+  await api(`/api/reels/${current}`, { method: 'DELETE' }); S = await api('/api/state'); S.reels.length ? open(S.reels[0].name) : newVideo();
+};
+$('saveyaml').onclick = async () => {
+  try { const info = await api(`/api/reels/${current}/yaml`, { method: 'POST', body: $('yaml').value }); msg('YAML saved.'); showResult(info); }
+  catch (e) { msg(e.message, true); }
+};
+const drop = $('drop');
+drop.onclick = () => $('files').click();
+drop.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') $('files').click(); };
+$('files').onchange = (e) => upload([...e.target.files]);
+drop.ondragover = (e) => { e.preventDefault(); drop.classList.add('over'); };
+drop.ondragleave = () => drop.classList.remove('over');
+drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove('over'); upload([...e.dataTransfer.files]); };
+
+(async () => {
+  S = await api('/api/state');
+  if (S.voices.some((v) => v.ready)) choice.voice = S.voices.find((v) => v.ready).name;
+  renderOptions();
+  S.reels.length ? open(S.reels[0].name) : newVideo();
+})();
+</script>
+</body>
+</html>

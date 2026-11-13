@@ -72,6 +72,17 @@ def _background(b: Beat) -> tuple[str, dict] | None:
     return None
 
 
+def _video_background(src: Path, dur: float, w: int, h: int, out: Path) -> Path:
+    """A video clip as a beat background: scaled to cover the frame, looped or trimmed to the beat,
+    a touch darker so text on top stays readable, without its own sound."""
+    if not src.exists():
+        raise FileNotFoundError(f"video not found: {src}")
+    ff("-stream_loop", "-1", "-i", str(src), "-t", f"{dur:.3f}", "-an", "-vf",
+       f"scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},eq=brightness=-0.04:saturation=0.92,fps={FPS}",
+       "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p", str(out))
+    return out
+
+
 def _images_used(reel: Reel) -> set[str]:
     used: set[str] = set()
 
@@ -168,8 +179,15 @@ def _mix(reel: Reel, takes: list[Take], starts: list[float], total: float, video
         shutil.copy(video, out)
 
 
-def render(ref: str | Path, out: Path | None = None) -> Result:
-    """Renders a reel (a name in the workspace, or a path to its spec file)."""
+def render(ref: str | Path, out: Path | None = None, on_progress=None) -> Result:
+    """Renders a reel (a name in the workspace, or a path to its spec file). `on_progress(stage, done,
+    total, extra)` is called as the render moves along (the local app uses it for its progress bar)."""
+
+    def report(stage: str, done: int = 0, total: int = 0, **extra: object) -> None:
+        progress(stage, done, total, **extra)
+        if on_progress:
+            on_progress(stage, done, total, extra)
+
     spec_path, base = resolve_reel(str(ref))
     reel = load(spec_path)
     build = base / "build"
@@ -178,7 +196,7 @@ def render(ref: str | Path, out: Path | None = None) -> Result:
     out = out or base / f"{name}.mp4"
 
     log(f"voice: {reel.voice}")
-    progress("voice", 0, len(reel.beats), voice=reel.voice)
+    report("voice", 0, len(reel.beats), voice=reel.voice)
     takes = speak([Line(b.say, b.pronounce or b.say) for b in reel.beats], reel.voice, build / "voice", log=log)
     durs = [round(max(1.6, LEAD + t.seconds + PAD), 2) for t in takes]
     durs[-1] = max(durs[-1], 2.6)
@@ -186,7 +204,7 @@ def render(ref: str | Path, out: Path | None = None) -> Result:
     starts = [sum(durs[:k]) for k in range(len(durs))]
 
     log(f"drawing {len(reel.beats)} beats ({total:.1f}s, {reel.format})")
-    progress("draw", 0, len(reel.beats), seconds=round(total, 2))
+    report("draw", 0, len(reel.beats), seconds=round(total, 2))
     fmt = formats.get(reel.format)
     parts: list[Path] = []
     with page(fmt.w, fmt.h) as p:
@@ -194,7 +212,10 @@ def render(ref: str | Path, out: Path | None = None) -> Result:
             states, caps = cards.render_beat(p, reel, k, build)
             scene_mp4 = None
             bg = _background(b)
-            if bg:
+            clip_bg = getattr(getattr(b, "background", None), "video", None)
+            if clip_bg:
+                scene_mp4 = _video_background(base / clip_bg, durs[k], fmt.w, fmt.h, build / f"{k:02d}_clip.mp4")
+            elif bg:
                 words = [(w, s) for w, (s, _) in zip(caption_words(b.say), takes[k].word_times)]
                 html = scenes.page_html(bg[0], bg[1], style(reel), durs[k], takes[k].seconds, LEAD, words, base)
                 scene_mp4 = scenes.render(p, html, durs[k], build / f"{k:02d}_scene.mp4")
@@ -202,17 +223,17 @@ def render(ref: str | Path, out: Path | None = None) -> Result:
             _clip(k, durs[k], takes[k], states, caps, scene_mp4, starts[k], total, build, reel, part)
             parts.append(part)
             log(f"  beat {k + 1}/{len(reel.beats)} done")
-            progress("draw", k + 1, len(reel.beats))
+            report("draw", k + 1, len(reel.beats))
     joined = build / "joined.mp4"
     lst = build / "parts.txt"
     lst.write_text("".join(f"file '{p}'\n" for p in parts))
     ff("-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(joined))
-    progress("mix")
+    report("mix")
     _mix(reel, takes, starts, total, joined, build, out)
     cap = out.with_name("caption.txt")
     cap.write_text(caption_text(reel, base), encoding="utf-8")
     log(f"done: {out} ({total:.1f}s)")
-    progress("done", 1, 1, video=str(out), seconds=round(total, 2))
+    report("done", 1, 1, video=str(out), seconds=round(total, 2))
     return Result(out, cap, total, [t.score for t in takes])
 
 

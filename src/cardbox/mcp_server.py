@@ -132,11 +132,12 @@ def create_reel(name: str, spec_yaml: str) -> str:
 def make_video(name: str, script: str, format: str = "vertical", theme: str = "midnight", voice: str = "default") -> str:
     """Creates a video from a plain-text script: one paragraph per beat, the first is the hook, the last is the
     closing card. A line starting with '# ' sets a beat's on-screen headline; '# 8.8% of the music' makes a stat card.
+    A line '@ file.jpg' (or .mp4) puts a file from the video's media/ folder behind that beat (use add_image first).
     Easiest way to start; refine afterwards with get_reel/create_reel (scenes, images, timing)."""
     from .script import from_text
 
     try:
-        reel = from_text(script, format=format, theme=theme, voice=voice)
+        reel = from_text(script, media_dir=reel_dir(name) / "media", format=format, theme=theme, voice=voice)
     except (ValueError, ValidationError) as e:
         return f"Couldn't build the video: {e}"
     d = reel_dir(name)

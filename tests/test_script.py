@@ -44,3 +44,28 @@ def test_headline(spoken, shown):
 def test_needs_a_hook_and_an_ending():
     with pytest.raises(ValueError):
         from_text("Just one paragraph.")
+
+
+def test_media_lines_and_numbered_files(tmp_path):
+    media = tmp_path / "media"
+    media.mkdir()
+    (media / "1.jpg").write_bytes(b"x")
+    (media / "03-city.mp4").write_bytes(b"x")
+    text = "Hook line here.\n\nSecond beat.\n@ map.png\n\nThird beat.\n\nBye now."
+    r = from_text(text, media_dir=media)
+    assert r.beats[0].background.image == "media/1.jpg"
+    assert r.beats[1].background.image == "media/map.png"
+    assert r.beats[2].background.video == "media/03-city.mp4"
+    assert "@" not in r.beats[1].say
+
+
+@pytest.mark.parametrize("head,value,label", [
+    ("1 million checks", "1 million", "checks"),
+    ("8.8% of the music", "8.8%", "of the music"),
+    ("265 ms to start a song", "265 ms", "to start a song"),
+    ("₹615 crore to the Moon", "₹615 crore", "to the Moon"),
+    ("10x faster", "10x", "faster"),
+])
+def test_stat_headlines(head, value, label):
+    r = from_text(f"Hook.\n\n# {head}\nSpoken line.\n\nBye.")
+    assert (r.beats[1].value, r.beats[1].label) == (value, label)

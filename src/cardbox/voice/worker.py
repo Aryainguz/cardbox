@@ -94,8 +94,8 @@ def run(spec: dict) -> list[dict]:
         if best["file"] != out:
             os.replace(best["file"], out)
         Path(out + ".heard.json").write_text(json.dumps({"text": best["text"], "words": best["heard"], "score": best["score"]}))
-        report.append({"out": out, "score": round(best["score"], 3), "seed": best["seed"], "attempts": best["attempts"],
-                       "heard": best["text"]})
+        report.append({"out": out, "score": round(best["score"], 3), "seed": best["seed"], "best_attempt": best["attempts"],
+                       "tries": attempt + 1, "heard": best["text"]})
         print(json.dumps(report[-1]), file=sys.stderr, flush=True)
     return report
 

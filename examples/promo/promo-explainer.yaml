@@ -1,0 +1,84 @@
+title: How to make videos with cardbox
+format: landscape
+handle: cardbox
+theme: midnight
+accent: "#FFE14D"
+voice: inguz
+music: upbeat
+caption: >-
+  I built cardbox: give it words, get back a finished video, narrated in your own cloned voice. Free and open
+  source, works with any AI assistant over MCP. github.com/aryainguz/cardbox
+hashtags: [opensource, ai, mcp, devtools, video]
+beats:
+  - kind: scene
+    scene: logo
+    say: This is cardbox. You give it words, and it gives you back a finished video, in your own voice. Here's how it works.
+    params: {name: cardbox, tagline: say it. ship the video., on: cardbox}
+  - kind: scene
+    scene: chat
+    head: Ask your AI assistant
+    say: The easiest way is to ask your AI assistant. Cardbox plugs into Claude, Cursor, or any app that supports MCP. Ask for a video about how DNS works, and it writes the script, checks the frames, and renders it.
+    pronounce: The easiest way is to ask your AI assistant. Cardbox plugs into Claude, Cursor, or any app that supports M C P. Ask for a video about how DNS works, and it writes the script, checks the frames, and renders it.
+    params:
+      title: AI assistant
+      messages:
+        - {from: user, text: "Make a 40-second video about how DNS works, in my voice.", on: ask}
+        - {from: ai, text: "Writing the script… checking frames… rendering.", on: writes}
+        - {from: ai, text: "Done: dns.mp4 · 41 seconds", on: renders}
+  - kind: scene
+    scene: script
+    head: Or just write it
+    say: No assistant? Just write plain text. Every paragraph becomes one beat on screen. The first one is your hook, and the last one is your ending.
+    params:
+      paragraphs:
+        - Your phone finds one contact out of ten thousand in a single step.
+        - Searching one by one gets slower as the list grows.
+        - Follow for more, explained simply.
+      on: [every, first, last]
+  - kind: scene
+    scene: terminal
+    head: One command
+    say: Then run one command, cardbox make, with your file. A minute later, you have the video, and a caption ready to post.
+    params:
+      title: terminal
+      lines:
+        - {text: cardbox make script.txt --render, on: command}
+        - {text: "✓ 6 beats · voice: me · vertical · 41.2s", output: true, on: minute}
+        - {text: "✓ script.mp4", output: true, on: video}
+        - {text: "✓ caption.txt", output: true, on: caption}
+  - kind: scene
+    scene: voice
+    head: Your voice, checked
+    say: To use your own voice, read ten short lines once. Cardbox clones it, right on your computer. And it listens to every line it speaks, so if a word comes out wrong, it records that line again.
+    params: {text: Give it a star if this fooled you, wrong: {index: 3, heard: start}, on: listens}
+  - kind: scene
+    scene: counter
+    head: Timed to your words
+    say: Animations are timed to what you say. Mention three hundred sixty thousand, and the counter lands right on it.
+    params: {to: 360000, label: lands right on the word, on: three, seconds: 1.4}
+  - kind: scene
+    scene: formats
+    head: Any format
+    say: One script works everywhere. Vertical for Reels and Shorts. Landscape for YouTube. Square for LinkedIn.
+    params: {on: [vertical, landscape, square]}
+  - kind: list
+    head: Make it yours
+    items:
+      - {icon: palette, text: "7 themes, any accent color"}
+      - {icon: captions, text: 4 caption styles}
+      - {icon: audio-lines, text: 3 music moods}
+      - {icon: image, text: Your own images and clips}
+    say: Pick a theme, a caption style, and a music mood. Drop your own images or video clips in a folder, and they show up behind your words.
+  - kind: scene
+    scene: terminal
+    head: For developers
+    say: And for developers, there's a Go render API, with a job queue, live progress, and webhooks.
+    params:
+      title: render api
+      lines:
+        - {text: curl -X POST localhost:8080/v1/renders --data-binary @video.yaml, on: render}
+        - {text: "event: progress  {\"stage\": \"draw\", \"done\": 4, \"total\": 6}", output: true, on: progress}
+        - {text: "event: status    {\"status\": \"succeeded\"}", output: true, on: webhooks}
+  - kind: end
+    text: github.com/aryainguz/cardbox
+    say: It's free and open source. The link is on screen. Give it a star, and make your first video today.
