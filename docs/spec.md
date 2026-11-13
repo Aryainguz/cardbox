@@ -1,5 +1,10 @@
 # Spec reference
 
+> **You may not need this page.** The easiest way to make a video is the app (`cardbox`) or plain text
+> (`cardbox make script.txt`): no paid AI, no YAML. The app writes this spec for you. Read on when you
+> want full control: animated scenes, word-timed animations, backgrounds. An AI assistant connected over
+> MCP can also write specs for you.
+
 A cardbox video is one YAML (or JSON) file. Each **beat** is one thing on screen plus one spoken line.
 The spoken line sets the timing: a beat lasts as long as it takes to say it.
 
