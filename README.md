@@ -6,8 +6,8 @@
 
 <p align="center">
   <b>Script in. Video out. In your own voice.</b><br>
-  Narrated, captioned, animated videos for Reels, Shorts, YouTube and LinkedIn, from one YAML file<br>
-  or straight from your AI assistant over MCP.
+  Narrated, captioned, animated videos for Reels, Shorts, YouTube and LinkedIn from plain text.<br>
+  No paid AI needed, and your AI assistant can drive it over MCP when you want more.
 </p>
 
 <p align="center">
@@ -27,9 +27,22 @@
 
 ---
 
-https://github.com/aryainguz/cardbox/raw/main/site/media/promo-vertical.mp4
+https://github.com/aryainguz/cardbox/raw/main/site/media/cardbox-explainer.mp4
 
-> **That video was made entirely with cardbox.** The script, the visuals, the music, and the voice: it's a clone, recorded in one minute.
+> **This explainer was made with cardbox.** The visuals and music are cardbox; the narration is my cloned voice, recorded in about a minute.
+
+## No paid AI needed
+
+cardbox's core needs **no paid AI, no API keys and no account**. Write what you want to say in plain text, pick a look, and it makes the video on your own computer, voice included.
+
+**Want more?** Connect your AI assistant (Claude, Cursor or any MCP client). It can write the script from one sentence, find openly licensed images, pick animated scenes and time them to your words, and check preview frames before rendering.
+
+| | Without AI (free, the core) | With your AI assistant (optional) |
+| --- | --- | --- |
+| Script | You write plain text | Written from one sentence |
+| Visuals | Templates, themes, your own images and clips | + licensed image search, scene choice, word-timed animations |
+| Voice | Your cloned voice, or the computer's voice | Same |
+| Cost | Free | Whatever your assistant costs |
 
 ## Why cardbox
 
@@ -48,7 +61,7 @@ Follow for more computer science, explained simply.
 ```
 
 ```bash
-cardbox make script.txt --format vertical --voice me --render     # → script.mp4 + caption.txt
+cardbox make script.txt --format vertical --voice me --render     # → script.mp4 + caption.txt (or just use the app)
 ```
 
 Each paragraph becomes one beat. The first is the hook, the last is the closing card, a `# headline` sets what's on screen, and a headline that starts with a number becomes a big stat card.
@@ -92,28 +105,32 @@ Requirements: Python 3.10+, `ffmpeg`, and Chrome or Chromium.
 ```bash
 pip install cardbox
 python -m playwright install chromium   # skip if Google Chrome is installed
-cardbox doctor                          # checks ffmpeg, the browser and voice support
-
-cardbox make "Hello world. This is my first video.
-
-Follow for more." --name hello --render  # plain text straight to video
-
-cardbox new my-first-video              # or a full spec: ~/Cardbox/reels/my-first-video/reel.yaml
-cardbox preview my-first-video 1        # a PNG of beat 1, in a couple of seconds
-cardbox render my-first-video
+cardbox                                 # opens the app in your browser
 ```
 
-The template uses the operating system's voice, so it works with no extra installs. To narrate in **your** voice:
+<p align="center"><img src="site/media/app.jpg" alt="The cardbox app" width="820"></p>
+
+The app does everything without commands. You write the script, pick a format, theme, voice and music, drop in your own images or clips, record your voice, preview every frame, and render. You can then watch the video, download it and copy its caption. Your videos live in `~/Cardbox`, shared with the CLI and the MCP server.
+
+**Your own voice.** Click *Record my voice* in the app (about a minute of reading). Cloning needs the voice extras:
 
 ```bash
-pip install "cardbox[voice]"            # Chatterbox + Whisper (PyTorch; GPU or Apple Silicon recommended)
-cardbox voice record me                 # opens the recording studio in your browser
-cardbox voice test "Hello, this is my cloned voice." --voice me
+pip install "cardbox[voice]"            # Chatterbox + Whisper (PyTorch; Apple Silicon or a GPU recommended)
 ```
 
-Then set `voice: me` in any spec.
+> The voice stack is heavy. To keep PyTorch out of your main environment, install `cardbox[voice]` in a separate one and point `CARDBOX_VOICE_PYTHON` at its interpreter.
 
-> The voice stack is heavy. If you'd rather keep PyTorch out of your main environment, install `cardbox[voice]` in a separate one and point `CARDBOX_VOICE_PYTHON` at its interpreter.
+**Your own images and clips.** Drop them into the app, or into the video's `media/` folder. Name them `1.jpg`, `2.mp4`, … to use them for beat 1, 2, … or write `@ photo.jpg` inside a paragraph.
+
+### Prefer the terminal?
+
+```bash
+cardbox make script.txt --format landscape --voice me --render   # plain text → video
+cardbox new my-video && cardbox render my-video                   # a full YAML spec
+cardbox preview my-video 1                                        # a PNG of beat 1
+cardbox voice record me                                           # the recording studio
+cardbox doctor                                                    # check your setup
+```
 
 ## Use it from your AI assistant (MCP)
 

@@ -6,23 +6,25 @@ accent: "#FFE14D"
 voice: inguz
 music: upbeat
 caption: >-
-  This isn't my real voice. My AI assistant wrote the script, and the open-source tool I built turned it into this
-  video, in a clone of my voice. Comment REPO and I'll send you the link.
+  This isn't my real voice, and I didn't edit this video. I wrote a few lines of plain text and the open-source tool
+  I built turned it into this, in a clone of my voice. No paid AI needed. Comment REPO and I'll send you the link.
 hashtags: [ai, opensource, voiceclone, mcp, devtools]
 beats:
   - kind: hook
     eyebrow: Not a real recording
     text: This isn't my real voice.
-    say: This isn't my real voice. It's an AI clone. And this whole video came from one sentence.
+    say: This isn't my real voice. It's a clone. And I didn't edit this video. I just wrote it down.
     background: {scene: voice, params: {text: "", on: 0}}
   - kind: scene
-    scene: chat
-    head: One sentence in
-    say: I asked my AI assistant for a video. It wrote the script, and my open-source tool turned it into this.
+    scene: script
+    head: Just write it
+    say: I wrote a few lines of plain text. No paid AI needed. My open-source tool turned them into this.
     params:
-      messages:
-        - {from: user, text: "Make a 30-second reel about my new tool, in my voice.", on: asked}
-        - {from: ai, text: "Done: reel.mp4 · 30 seconds", on: turned}
+      paragraphs:
+        - This isn't my real voice.
+        - I wrote a few lines of plain text.
+        - Comment REPO for the link.
+      on: [wrote, paid, turned]
   - kind: scene
     scene: voice
     head: It checks itself
