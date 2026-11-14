@@ -195,7 +195,9 @@ def render(ref: str | Path, out: Path | None = None, on_progress=None) -> Result
     name = spec_path.parent.name if spec_path.stem == "reel" else spec_path.stem
     out = out or base / f"{name}.mp4"
 
-    log(f"voice: {reel.voice}")
+    from .voice.engines import resolve_voice
+
+    log(f"voice: {resolve_voice(reel.voice)}")
     report("voice", 0, len(reel.beats), voice=reel.voice)
     takes = speak([Line(b.say, b.pronounce or b.say) for b in reel.beats], reel.voice, build / "voice", log=log)
     durs = [round(max(1.6, LEAD + t.seconds + PAD), 2) for t in takes]

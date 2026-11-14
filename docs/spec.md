@@ -19,7 +19,7 @@ The spoken line sets the timing: a beat lasts as long as it takes to say it.
 | `accent` | | Hex color overriding the theme accent, e.g. `"#22C55E"` |
 | `font` | `sans` | `sans` (Inter) or `mono` (JetBrains Mono) |
 | `captions` | `highlight` | `highlight`, `box`, `minimal`, `none` |
-| `voice` | `default` | A recorded voice name, `system`, or `none` (silent; timings estimated) |
+| `voice` | `auto` | `auto` (your recorded voice if you have one, else the computer's voice), a recorded voice name, `system`, or `none` (silent; timings estimated) |
 | `music` | `calm` | `calm`, `upbeat`, `tense`, `none` |
 | `caption` | | The post caption written to `caption.txt` |
 | `hashtags` | | Up to 5 |
@@ -35,7 +35,7 @@ Every beat has `say` (the spoken line; captions show exactly these words) and ma
   eyebrow: Small caps line above
   text: The headline
   say: ...
-  background: {image: media/photo.jpg}        # optional; or {scene: counter, params: {...}}
+  background: {image: media/photo.jpg}        # optional; or {video: media/clip.mp4}, or {scene: counter, params: {...}}
 
 - kind: text
   text: Headline
@@ -109,6 +109,31 @@ k of n icons light up. `n`, `k`, `cols`, `icon`, `result: {text, on}`.
 An image in a framed card with a slow push-in, or full-bleed with `full: true` (used for `background`).
 `image` (path relative to the spec), `from`/`to` crops as `[x, y, width]` fractions of the image,
 `label: {text, on, color}`, `stamp: {text, on, color}` (a rubber stamp slamming down).
+
+### logo
+A logo reveal: an isometric box assembles, then a name and tagline. `name`, `tagline`, `on`.
+
+### chat
+A conversation with an AI assistant, with typing dots before each answer. `title`, `messages: [{from: user|ai, text, on}]`.
+
+### script
+A plain-text script whose paragraphs light up one by one and turn into video frames. `title`, `paragraphs: [text]`,
+`on: [cue per paragraph]`.
+
+### voice
+A waveform and live transcript; one misheard word is caught, struck out and corrected. `text`, `wrong: {index, heard}`, `on`.
+
+### formats
+One frame morphing between 9:16, 16:9 and 1:1. `labels: [3 strings]`, `on: [3 cues]`.
+
+## Your own images and clips
+
+Put files in the video's `media/` folder (or drop them into the app), then:
+
+- `background: {image: media/photo.jpg}` or `background: {video: media/clip.mp4}` on a hook or text beat;
+- in plain-text scripts, a line `@ photo.jpg` inside a paragraph, or name files by beat number (`1.jpg`, `02.mp4`).
+
+Video clips are scaled to cover the frame, looped or trimmed to the beat, and muted.
 
 ## YAML tips
 

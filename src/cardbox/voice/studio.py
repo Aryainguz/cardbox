@@ -14,6 +14,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
+from ..localguard import allowed
 from ..workspace import TEMPLATES
 from .profile import CONSENT, PROMPTS, Profile
 
@@ -24,6 +25,29 @@ def _handler(profile: Profile):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args) -> None:  # keep the terminal quiet
             pass
+
+        def handle_one_request(self) -> None:
+            # Every request goes through the local guard first (see localguard.py).
+            self.raw_requestline = self.rfile.readline(65537)
+            if not self.raw_requestline:
+                self.close_connection = True
+                return
+            if not self.parse_request():
+                return
+            if not allowed(self.command, self.headers):
+                body = b'{"error": "forbidden: cardbox only accepts requests from this computer"}'
+                self.send_response(403)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Content-Length', str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            method = getattr(self, 'do_' + self.command, None)
+            if method is None:
+                self.send_error(501, 'Unsupported method')
+                return
+            method()
+            self.wfile.flush()
 
         def _json(self, data: dict, code: int = 200) -> None:
             body = json.dumps(data).encode()

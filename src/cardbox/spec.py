@@ -106,8 +106,9 @@ class Reel(_Model):
     captions: Literal["highlight", "box", "minimal", "none"] = Field(
         default="highlight", description="How spoken-word captions look; 'none' turns them off.")
     voice: str = Field(
-        default="default",
-        description="A recorded voice profile name, 'system' (the OS voice) or 'none' (silent, timed by estimate).",
+        default="auto",
+        description="'auto' (your recorded voice if you have one, else the computer's voice), a recorded voice name, "
+        "'system' (the computer's voice) or 'none' (silent, timed by estimate).",
     )
     music: Music | bool = Field(default="calm", description="calm, upbeat, tense, or none.")
     caption: str = ""

@@ -36,7 +36,7 @@ spoken line (`say`). The voice sets the timing: a beat lasts as long as its line
 title: Why your Wi-Fi slows down at night
 handle: "@yourname"          # shown on every card
 theme: midnight              # midnight | ember | forest | mono
-voice: default               # a recorded voice, "system", or "none" (silent preview)
+voice: auto                  # auto (your voice if recorded), a voice name, "system", or "none"
 caption: The post caption. Line one is what people see before "more".
 hashtags: [wifi, networking, techexplained]   # up to 5
 beats:
@@ -129,7 +129,7 @@ def create_reel(name: str, spec_yaml: str) -> str:
 
 
 @mcp.tool()
-def make_video(name: str, script: str, format: str = "vertical", theme: str = "midnight", voice: str = "default") -> str:
+def make_video(name: str, script: str, format: str = "vertical", theme: str = "midnight", voice: str = "auto") -> str:
     """Creates a video from a plain-text script: one paragraph per beat, the first is the hook, the last is the
     closing card. A line starting with '# ' sets a beat's on-screen headline; '# 8.8% of the music' makes a stat card.
     A line '@ file.jpg' (or .mp4) puts a file from the video's media/ folder behind that beat (use add_image first).

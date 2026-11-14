@@ -142,7 +142,7 @@ def _doctor(_: argparse.Namespace) -> None:
     print(f"{'✓' if all(stack.values()) else '·'} voice cloning ({voice_python()}): "
           + ", ".join(f"{k} {'ok' if v else 'missing'}" for k, v in stack.items()))
     if not all(stack.values()):
-        print("    optional: pip install 'cardbox[voice]'  (or set CARDBOX_VOICE_PYTHON)")
+        print("    optional: pip install 'cardbox-video[voice]'  (or set CARDBOX_VOICE_PYTHON)")
     say = shutil.which("say") or shutil.which("espeak-ng")
     print(f"{'✓' if say else '·'} system voice: {say or 'none (voice: system unavailable)'}")
     sys.exit(0 if ok else 1)

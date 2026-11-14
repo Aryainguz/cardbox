@@ -21,7 +21,7 @@
 <p align="center">
   <img alt="license" src="https://img.shields.io/badge/license-MIT-black">
   <img alt="python" src="https://img.shields.io/badge/python-3.10%2B-black">
-  <img alt="go" src="https://img.shields.io/badge/go-1.22%2B-black">
+  <img alt="go" src="https://img.shields.io/badge/go-1.26%2B-black">
   <img alt="mcp" src="https://img.shields.io/badge/MCP-server-black">
 </p>
 
@@ -103,7 +103,7 @@ beats:
 Requirements: Python 3.10+, `ffmpeg`, and Chrome or Chromium.
 
 ```bash
-pip install cardbox
+pip install cardbox-video
 python -m playwright install chromium   # skip if Google Chrome is installed
 cardbox                                 # opens the app in your browser
 ```
@@ -115,10 +115,10 @@ The app does everything without commands. You write the script, pick a format, t
 **Your own voice.** Click *Record my voice* in the app (about a minute of reading). Cloning needs the voice extras:
 
 ```bash
-pip install "cardbox[voice]"            # Chatterbox + Whisper (PyTorch; Apple Silicon or a GPU recommended)
+pip install "cardbox-video[voice]"            # Chatterbox + Whisper (PyTorch; Apple Silicon or a GPU recommended)
 ```
 
-> The voice stack is heavy. To keep PyTorch out of your main environment, install `cardbox[voice]` in a separate one and point `CARDBOX_VOICE_PYTHON` at its interpreter.
+> The voice stack is heavy. To keep PyTorch out of your main environment, install `cardbox-video[voice]` in a separate one and point `CARDBOX_VOICE_PYTHON` at its interpreter.
 
 **Your own images and clips.** Drop them into the app, or into the video's `media/` folder. Name them `1.jpg`, `2.mp4`, … to use them for beat 1, 2, … or write `@ photo.jpg` inside a paragraph.
 
@@ -172,7 +172,7 @@ Then just ask: *"Make a 40-second vertical video explaining how DNS works, in my
 
 **Beat kinds:** `hook`, `text`, `stat`, `list`, `scene`, `end`. Hooks and text beats can take a `background` (an image with a slow push-in, or any scene).
 
-**Scenes:** `counter` · `donut` · `bars` · `flow` · `terminal` · `mesh` · `grid` · `photo`. See [docs/spec.md](docs/spec.md) for every parameter.
+**Scenes (13):** `counter` · `donut` · `bars` · `flow` · `terminal` · `mesh` · `grid` · `photo` · `logo` · `chat` · `script` · `voice` · `formats`. See [docs/spec.md](docs/spec.md) for every parameter.
 
 **Pronunciation:** captions show `say`, but the voice reads `pronounce` when you set it. Write `say: SongsPK` with `pronounce: Songs P K`.
 

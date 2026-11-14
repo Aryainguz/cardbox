@@ -3,9 +3,9 @@ requires = ["hatchling>=1.24"]
 build-backend = "hatchling.build"
 
 [project]
-name = "cardbox"
+name = "cardbox-video"
 version = "0.1.0"
-description = "Write a script, get a narrated, captioned, animated short video in your own cloned voice. Ships an MCP server so any AI assistant can make them."
+description = "Plain text in, finished video out: narrated, captioned, animated videos in your own cloned voice. No paid AI needed; an MCP server lets any AI assistant drive it."
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
@@ -15,6 +15,12 @@ classifiers = [
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Environment :: Web Environment",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
   "Topic :: Multimedia :: Video",
   "Topic :: Multimedia :: Sound/Audio :: Speech",
 ]
@@ -37,7 +43,10 @@ cardbox = "cardbox.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/aryainguz/cardbox"
+Documentation = "https://aryainguz.github.io/cardbox"
+Source = "https://github.com/aryainguz/cardbox"
 Issues = "https://github.com/aryainguz/cardbox/issues"
+Changelog = "https://github.com/aryainguz/cardbox/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/cardbox"]

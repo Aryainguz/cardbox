@@ -26,6 +26,7 @@ import yaml
 from pydantic import ValidationError
 
 from . import formats, spec, themes
+from .localguard import allowed
 from .script import IMAGE_EXT, VIDEO_EXT, from_text
 from .voice.profile import Profile
 from .workspace import TEMPLATES, home, reel_dir, slug
@@ -156,6 +157,29 @@ def start_render(name: str) -> dict:
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args) -> None:
         pass
+
+    def handle_one_request(self) -> None:
+        # Every request goes through the local guard first (see localguard.py).
+        self.raw_requestline = self.rfile.readline(65537)
+        if not self.raw_requestline:
+            self.close_connection = True
+            return
+        if not self.parse_request():
+            return
+        if not allowed(self.command, self.headers):
+            body = b'{"error": "forbidden: cardbox only accepts requests from this computer"}'
+            self.send_response(403)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        method = getattr(self, 'do_' + self.command, None)
+        if method is None:
+            self.send_error(501, 'Unsupported method')
+            return
+        method()
+        self.wfile.flush()
 
     # ---- responses ----
     def _send(self, code: int, body: bytes, ctype: str, extra: dict | None = None) -> None:

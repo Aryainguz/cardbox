@@ -1,5 +1,5 @@
 # One image with the renderer (Python + Chromium + ffmpeg) and the Go API in front of it.
-FROM golang:1.22-bookworm AS server
+FROM golang:1.26-bookworm AS server
 WORKDIR /src
 COPY server/go.mod server/go.sum ./
 RUN go mod download

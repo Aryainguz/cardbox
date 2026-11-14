@@ -189,7 +189,7 @@ Searching names one by one gets slower and slower as your list grows.
 A hash function turns a name into a number, the exact shelf where that contact lives.
 
 Follow for more computer science, explained simply.`;
-let S = null, current = null, choice = { format: 'vertical', theme: 'midnight', voice: 'system', music: 'calm', captions: 'highlight', handle: '' };
+let S = null, current = null, choice = { format: 'vertical', theme: 'midnight', voice: 'auto', music: 'calm', captions: 'highlight', handle: '' };
 let poll = null;
 
 function msg(text, err = false) { $('msg').textContent = text; $('msg').className = 'msg' + (err ? ' err' : ''); }
@@ -203,7 +203,7 @@ function renderList() {
   }
   const v = S.voices[0];
   $('voicebox').innerHTML = v
-    ? `<b>🎙️ Voice: ${v.name}</b><small>${v.ready ? 'Ready to use' : `${v.recorded}/${v.total} lines recorded`}${S.cloning ? '' : ' · install cardbox[voice] to clone'}</small>`
+    ? `<b>🎙️ Voice: ${v.name}</b><small>${v.ready ? 'Ready to use' : `${v.recorded}/${v.total} lines recorded`}${S.cloning ? '' : ' · install cardbox-video[voice] to clone'}</small>`
     : `<b>🎙️ Your voice</b><small>Read 10 short lines (about a minute) and every video can sound like you.</small>`;
   const rec = document.createElement('button'); rec.className = 'btn sm'; rec.textContent = v ? 'Record more' : 'Record my voice';
   rec.onclick = () => recordVoice(v ? v.name : 'me'); $('voicebox').appendChild(rec);
@@ -223,9 +223,9 @@ function renderOptions() {
     $('theme').appendChild(b);
   }
   const fill = (id, values, labels = {}) => { $(id).innerHTML = values.map((v) => `<option value="${v}">${labels[v] || v}</option>`).join(''); $(id).value = choice[id]; };
-  const vnames = [...S.voices.filter((v) => v.ready).map((v) => v.name), 'system', 'none'];
+  const vnames = ['auto', ...S.voices.filter((v) => v.ready).map((v) => v.name), 'system', 'none'];
   if (!vnames.includes(choice.voice)) vnames.unshift(choice.voice);
-  fill('voice', vnames, { system: 'Computer voice', none: 'No voice (silent preview)', ...Object.fromEntries(S.voices.map((v) => [v.name, `My voice (${v.name})`])) });
+  fill('voice', vnames, { auto: 'Automatic (my voice if recorded)', system: 'Computer voice', none: 'No voice (silent preview)', ...Object.fromEntries(S.voices.map((v) => [v.name, `My voice (${v.name})`])) });
   fill('music', O.music); fill('captions', O.captions);
   $('handle').value = choice.handle || '';
 }

@@ -1,6 +1,6 @@
 module github.com/aryainguz/cardbox/server
 
-go 1.26.4
+go 1.26.0
 
 require modernc.org/sqlite v1.62.0
 
