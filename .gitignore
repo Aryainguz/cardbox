@@ -9,3 +9,4 @@ build/
 caption.txt
 .DS_Store
 data/
+tutorial/out/

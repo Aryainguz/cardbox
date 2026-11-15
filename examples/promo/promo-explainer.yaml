@@ -17,7 +17,7 @@ beats:
   - kind: scene
     scene: script
     head: Just write it
-    say: You don't need any paid AI to use it. Just write plain text. Every paragraph becomes one beat on screen. The first one is your hook, and the last one is your ending.
+    say: You don't need to pay for any AI to use it. Just write plain text. Every paragraph becomes one beat on screen. The first one is your hook, and the last one is your ending.
     params:
       paragraphs:
         - Your phone finds one contact out of ten thousand in a single step.

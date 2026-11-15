@@ -89,6 +89,9 @@ def match_score(expected: str, heard: str) -> float:
     """How closely a transcript matches the script (0..1), ignoring case, punctuation and how
     numbers are written."""
     def tokens(text: str) -> list[str]:
+        # Hyphens and run-together capitals are word breaks: "open-source" = "open source" and a
+        # recognizer's "GoRender" = "Go render". Without this, correct takes get retried for nothing.
+        text = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", text).replace("-", " ")
         spoken = [w.lower().strip(",.?!:;\"'()") for w in text.split()]
         return [norm(w) for w in numbers_to_digits(spoken) if norm(w)]
 

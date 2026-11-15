@@ -61,3 +61,6 @@ ignore = ["B905"]  # zips here pair lists built to the same length
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff.lint.per-file-ignores]
+"tutorial/*" = ["E501"]  # inline JavaScript for the recording overlay

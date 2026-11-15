@@ -36,3 +36,16 @@ def test_match_score_ignores_number_spelling_and_punctuation():
 
 def test_match_score_catches_a_slurred_word():
     assert match_score("Team SongsPK or team Spotify", "Teams on speak a or team Spotify") < 0.7
+
+
+@pytest.mark.parametrize("expected,heard", [
+    ("My open-source tool turned them into this.", "My open source tool turned them into this."),
+    ("there's a Go render API", "there's a GoRender API"),
+    ("twenty-three people", "23 people"),
+])
+def test_match_score_ignores_word_splitting(expected, heard):
+    assert match_score(expected, heard) == 1.0
+
+
+def test_match_score_still_catches_paid_vs_paired():
+    assert match_score("You don't need any paid AI to use it", "You don't need any paired AI to use it") < 0.97

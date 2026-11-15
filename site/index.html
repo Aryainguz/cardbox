@@ -71,7 +71,8 @@
   .stage::before { content: ""; position: absolute; inset: -16% -70%; z-index: -1; background: radial-gradient(closest-side, rgba(255,225,77,0.2), transparent); }
   .screen { border-radius: 20px; padding: 8px; background: #000; border: 2px solid #2C2C34; box-shadow: 0 40px 100px rgba(0,0,0,0.7); position: relative; }
   .screen video { width: 100%; aspect-ratio: 16/9; display: block; border-radius: 13px; background: #0E0E14; }
-  .play { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); white-space: nowrap; }
+  /* Centered without transform: the button's own hover/press transform must not move it sideways. */
+  .play { position: absolute; left: 0; right: 0; margin: 0 auto; width: max-content; bottom: 22px; white-space: nowrap; }
   .sticker { position: absolute; font: 700 15px var(--sans); color: #111; padding: 9px 14px; border-radius: 12px; white-space: nowrap;
     box-shadow: 0 4px 0 rgba(0,0,0,0.45); border: 2px solid #111; }
   .s1 { background: var(--yellow); left: -60px; top: -22px; transform: rotate(-6deg); }
@@ -393,7 +394,9 @@ $ curl -O localhost:8080/v1/renders/rnd_e3016b6c59a9/video</pre>
   row.innerHTML += row.innerHTML;
   // The hero video plays muted; one tap restarts it with sound.
   const video = document.getElementById('promo'), sound = document.getElementById('sound');
+  // Autoplay muted (browsers allow that), unless the visitor asked for reduced motion.
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { video.removeAttribute('autoplay'); video.pause(); }
+  else { video.muted = true; video.play().catch(() => {}); }
   sound.addEventListener('click', () => {
     video.muted = false; video.loop = false; video.currentTime = 0; video.controls = true; video.play(); sound.remove();
   });

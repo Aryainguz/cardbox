@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Terminal</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #1B1B22; }
+  body { display: flex; align-items: center; justify-content: center; font: 26px/1.55 "JetBrains Mono", ui-monospace, Menlo, monospace; }
+  .win { width: 1600px; height: 900px; background: #0E0E12; border-radius: 16px; box-shadow: 0 40px 120px rgba(0,0,0,0.55); overflow: hidden; border: 1px solid #2A2A33; display: flex; flex-direction: column; }
+  .bar { height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 18px; background: #18181F; border-bottom: 1px solid #26262E; color: #8A8A96; font-size: 17px; }
+  .bar b { width: 13px; height: 13px; border-radius: 50%; display: inline-block; }
+  .bar span { flex: 1; text-align: center; margin-right: 60px; }
+  #out { flex: 1; padding: 26px 32px; color: #E6E6EC; white-space: pre-wrap; overflow: hidden; }
+  .p { color: #FFE14D; } .ok { color: #3DDC84; } .dim { color: #8A8A96; } .cur { display: inline-block; width: 13px; height: 28px; background: #E6E6EC; vertical-align: -5px; animation: b 1s steps(1) infinite; }
+  @keyframes b { 50% { opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="win"><div class="bar"><b style="background:#FF5F57"></b><b style="background:#FEBC2E"></b><b style="background:#28C840"></b><span>~ — zsh</span></div><div id="out"></div></div>
+<script>
+  // A small terminal for the tutorial: commands are typed, and their real, captured output is printed.
+  const out = document.getElementById('out');
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const color = (line) => esc(line).replace(/^(✓.*)$/, '<span class="ok">$1</span>').replace(/^(·.*)$/, '<span class="dim">$1</span>');
+  let cursor = null;
+  function prompt() { const s = document.createElement('div'); s.innerHTML = '<span class="p">~ $</span> <span class="cmd"></span><span class="cur"></span>'; out.appendChild(s); cursor = s; return s; }
+  window.term = {
+    async type(cmd, ms = 55) {
+      const line = cursor || prompt(), span = line.querySelector('.cmd');
+      for (const ch of cmd) { span.textContent += ch; await new Promise((r) => setTimeout(r, ms + Math.random() * 40)); }
+      line.querySelector('.cur')?.remove(); cursor = null;
+    },
+    print(text) { const d = document.createElement('div'); d.innerHTML = text.split('\n').map(color).join('\n'); out.appendChild(d); while (out.scrollHeight > out.clientHeight && out.children.length > 1) out.removeChild(out.firstChild); },
+    prompt() { prompt(); },
+    clear() { out.innerHTML = ''; cursor = null; },
+  };
+  prompt();
+</script>
+</body>
+</html>
