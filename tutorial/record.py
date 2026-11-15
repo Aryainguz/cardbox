@@ -7,7 +7,8 @@ preparing the recording (with your home folder shown as ~).
 usage:
     python tutorial/record.py --voice me [--voice-home ~/Cardbox] [--out tutorial/out]
 
-Needs the voice stack for the narration (`cardbox-video[voice]`, or CARDBOX_VOICE_PYTHON).
+Needs the voice stack for the narration (`cardbox-video[voice]`, or CARDBOX_VOICE_PYTHON), Google Chrome, and
+Playwright's screen-recording encoder: `python -m playwright install ffmpeg`.
 Output: tutorial/out/cardbox-tutorial.mp4 (1920x1080).
 """
 
@@ -106,7 +107,7 @@ class Director:
 
     def __init__(self, page: Page, takes, t0: float):
         self.page, self.takes, self.t0, self.marks = page, takes, t0, []
-        self.mouse = (960, 540)
+        self.mouse = (800, 450)
 
     def now(self) -> float:
         return time.monotonic() - self.t0
@@ -121,7 +122,10 @@ class Director:
             self.page.wait_for_timeout(left * 1000)
 
     def move(self, selector: str, dx: float = 0.5, dy: float = 0.5) -> tuple[float, float]:
-        box = self.page.locator(selector).first.bounding_box()
+        target = self.page.locator(selector).first
+        target.scroll_into_view_if_needed()
+        self.page.wait_for_timeout(250)
+        box = target.bounding_box()
         if not box:
             raise RuntimeError(f"not on screen: {selector}")
         x, y = box["x"] + box["width"] * dx, box["y"] + box["height"] * dy
@@ -178,14 +182,15 @@ def main() -> None:
     if weak:
         print(f"warning: narration lines {weak} may have a misspoken word", flush=True)
 
-    app = subprocess.Popen([cardbox, "app", "--port", str(a.port), "--no-browser"], env=env, stdout=subprocess.PIPE,
-                           text=True)
+    app = subprocess.Popen([cardbox, "app", "--port", str(a.port), "--no-browser"], env={**env, "PYTHONUNBUFFERED": "1"},
+                           stdout=subprocess.PIPE, text=True)
     app_lines = [clean(app.stdout.readline()) for _ in range(2)]
     app_url = f"http://127.0.0.1:{a.port}/"
     try:
         with sync_playwright() as pw:
             browser = pw.chromium.launch(channel="chrome", headless=True)
-            ctx = browser.new_context(viewport={"width": 1920, "height": 1080}, record_video_dir=str(out / "raw"),
+            # A 1600x900 window recorded at 1920x1080: everything appears 20% larger, readable on a phone.
+            ctx = browser.new_context(viewport={"width": 1600, "height": 900}, record_video_dir=str(out / "raw"),
                                       record_video_size={"width": 1920, "height": 1080})
             ctx.add_init_script(CURSOR_JS)
             page = ctx.new_page()
@@ -205,7 +210,7 @@ def main() -> None:
                 page.wait_for_timeout(2200)
                 page.goto(app_url)
                 page.wait_for_selector("#script")
-                page.mouse.move(960, 600, steps=10)
+                page.mouse.move(800, 500, steps=10)
             d.beat(2, open_app)
             d.beat(3, lambda: d.click("#new"))
 
@@ -287,7 +292,7 @@ def main() -> None:
             def mcp():
                 page.goto((HERE / "terminal.html").as_uri())
                 page.wait_for_timeout(300)
-                page.mouse.move(1500, 900, steps=5)
+                page.mouse.move(1450, 820, steps=5)
                 term("() => term.type('cat mcp.json')")
                 term("(t) => term.print(t)", (assets / "mcp.json").read_text().rstrip())
             d.beat(14, mcp)

@@ -134,7 +134,7 @@ def start(voice: str, port: int = 8765, open_browser: bool = True) -> str:
 def serve_forever(voice: str, port: int = 8765) -> None:
     """For the CLI: start the studio and keep running until Ctrl+C."""
     url = start(voice, port)
-    print(f"Recording studio for voice '{Profile(voice).name}': {url}\nPress Ctrl+C when you're done.")
+    print(f"Recording studio for voice '{Profile(voice).name}': {url}\nPress Ctrl+C when you're done.", flush=True)
     try:
         threading.Event().wait()
     except KeyboardInterrupt:

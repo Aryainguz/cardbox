@@ -312,7 +312,8 @@ def serve(port: int = 8740, open_browser: bool = True) -> None:
     if server is None:
         raise RuntimeError("no free port for the cardbox app")
     url = f"http://127.0.0.1:{server.server_address[1]}/"
-    print(f"cardbox is running at {url}\nYour videos are in {home()}. Press Ctrl+C to stop.")
+    # flush: when stdout is a pipe (Docker logs, process managers), unflushed output would never appear.
+    print(f"cardbox is running at {url}\nYour videos are in {home()}. Press Ctrl+C to stop.", flush=True)
     if open_browser:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:

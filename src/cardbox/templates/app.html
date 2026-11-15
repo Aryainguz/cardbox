@@ -15,9 +15,10 @@
   body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
   button, input, select, textarea { font: inherit; color: inherit; }
   .app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
-  @media (max-width: 860px) { .app { grid-template-columns: 1fr; } aside { border-right: 0; border-bottom: 1px solid var(--line); } }
+  @media (max-width: 860px) { .app { grid-template-columns: 1fr; } aside { border-right: 0; border-bottom: 1px solid var(--line); position: static; height: auto; } }
 
-  aside { border-right: 1px solid var(--line); padding: 18px 14px; display: flex; flex-direction: column; gap: 14px; }
+  aside { border-right: 1px solid var(--line); padding: 18px 14px; display: flex; flex-direction: column; gap: 14px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto; }  /* videos and voice stay in view while the page scrolls */
   .brand { display: flex; align-items: center; gap: 10px; font: 800 22px var(--display); letter-spacing: -0.03em; padding: 4px 6px; }
   .brand svg { width: 28px; height: 28px; }
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 2px solid transparent; border-radius: 12px;
