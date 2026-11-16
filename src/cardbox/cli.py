@@ -161,7 +161,7 @@ def _mcp(_: argparse.Namespace) -> None:
 
 
 def main(argv: list[str] | None = None) -> None:
-    ap = argparse.ArgumentParser(prog="cardbox", description="Script in, narrated short video out.")
+    ap = argparse.ArgumentParser(prog="cardbox", description="Plain text in, finished video out. Run with no arguments to open the app.")
     ap.add_argument("--version", action="version", version=f"cardbox {__version__}")
     sub = ap.add_subparsers(dest="cmd")
 
@@ -187,8 +187,8 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--force", action="store_true")
     p.set_defaults(fn=_new)
 
-    p = sub.add_parser("render", help="render a reel to MP4")
-    p.add_argument("reel", help="reel name or path to a spec file")
+    p = sub.add_parser("render", help="render a video (its name, or a spec file) to MP4")
+    p.add_argument("reel", help="video name or path to a spec file")
     p.add_argument("-o", "--out")
     p.set_defaults(fn=_render)
 

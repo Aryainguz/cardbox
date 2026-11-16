@@ -132,6 +132,15 @@ cardbox voice record me                                           # the recordin
 cardbox doctor                                                    # check your setup
 ```
 
+## Tutorial
+
+A complete walkthrough, recorded live on a laptop: installing, the app, writing a script, formats and themes,
+your own images, previewing, rendering, voice recording, the YAML spec, MCP and the CLI. The narration is the
+author's cloned voice.
+
+The recording itself is reproducible: [`tutorial/record.py`](tutorial/record.py) drives the real app in Chrome,
+runs the real commands, and narrates with a recorded voice.
+
 ## Use it from your AI assistant (MCP)
 
 Add cardbox to your client's MCP config:
