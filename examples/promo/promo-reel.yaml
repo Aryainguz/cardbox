@@ -1,4 +1,4 @@
-title: This isn't my real voice
+title: I didn't edit this video
 format: vertical
 handle: "@inguzdev"
 theme: midnight
@@ -6,30 +6,30 @@ accent: "#FFE14D"
 voice: inguz
 music: upbeat
 caption: >-
-  This isn't my real voice, and I didn't edit this video. I wrote a few lines of plain text and the open-source tool
-  I built turned it into this, in a clone of my voice. No paid AI needed. Comment REPO and I'll send you the link.
-hashtags: [ai, opensource, voiceclone, mcp, devtools]
+  I didn't edit this video. My open-source tool did. And the voice isn't mine either: the tool cloned it from one
+  minute of my recordings. All I wrote was a few lines of text, no paid AI. Comment REPO and I'll send you the link.
+hashtags: [ai, opensource, voiceclone, devtools, buildinpublic]
 beats:
   - kind: hook
-    eyebrow: Not a real recording
-    text: This isn't my real voice.
-    say: This isn't my real voice. It's a clone. And I didn't edit this video. I just wrote it down.
+    eyebrow: Not edited by me
+    text: I didn't edit this video.
+    say: I didn't edit this video. My open-source tool did. And this voice isn't mine either. My tool cloned it.
     background: {scene: voice, params: {text: "", on: 0}}
   - kind: scene
     scene: script
-    head: Just write it
-    say: I wrote a few lines of plain text. No paid AI needed. My open-source tool turned them into this.
+    head: All I did was write
+    say: All I did was write a few lines of text. No editor, no paid AI.
     params:
       paragraphs:
-        - This isn't my real voice.
-        - I wrote a few lines of plain text.
+        - I didn't edit this video.
+        - All I did was write a few lines of text.
         - Comment REPO for the link.
-      on: [wrote, paid, turned]
+      on: [write, text, paid]
   - kind: scene
     scene: voice
     head: It checks itself
-    say: It clones your voice in a minute, and re-records any word it gets wrong.
-    params: {text: Give it a star if this fooled you, wrong: {index: 3, heard: start}, on: clones}
+    say: It even listens to its own voice, and re-records any word it gets wrong.
+    params: {text: Give it a star if this fooled you, wrong: {index: 3, heard: start}, on: listens}
   - kind: scene
     scene: formats
     head: Every platform

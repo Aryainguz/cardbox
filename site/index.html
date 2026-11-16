@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>cardbox · say it. ship it.</title>
+<title>cardbox · the agentic video editor that works without an agent</title>
 <meta name="description" content="Open-source video generator: write plain text, no paid AI needed, or connect your AI assistant over MCP, and get a narrated, captioned, animated video for Reels, YouTube or LinkedIn, in a clone of your own voice.">
-<meta property="og:title" content="cardbox: say it. ship it.">
+<meta property="og:title" content="cardbox: an agentic video editor that works without an agent">
 <meta property="og:description" content="Open source. Clone your voice in a minute, turn plain text into Reels, YouTube and LinkedIn videos, from any AI assistant over MCP.">
 <meta property="og:image" content="media/og.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -60,7 +60,8 @@
   .badge { display: inline-flex; align-items: center; gap: 10px; font: 600 14px var(--sans); background: var(--panel); border: 1px solid var(--line);
     padding: 7px 14px 7px 8px; border-radius: 999px; color: var(--dim); text-decoration: none; }
   .badge b { background: var(--green); color: #052; font-size: 12px; padding: 2px 8px; border-radius: 999px; }
-  h1 { font: 800 clamp(54px, 9.4vw, 120px)/0.92 var(--display); letter-spacing: -0.045em; margin: 26px auto 24px; max-width: 980px; }
+  h1 { font: 800 clamp(36px, 6.2vw, 84px)/1.02 var(--display); letter-spacing: -0.045em; margin: 26px auto 24px; max-width: 1100px; text-wrap: balance; }
+  h1 .hl { white-space: nowrap; }  /* "without an agent." stays on one line */
   .sub { font-size: clamp(18px, 2.2vw, 21px); color: var(--dim); max-width: 640px; margin: 0 auto 30px; }
   .sub b { color: var(--text); font-weight: 600; }
   .ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
@@ -93,6 +94,11 @@
   h2 { font: 800 clamp(40px, 6vw, 72px)/0.98 var(--display); letter-spacing: -0.04em; margin: 12px 0 18px; }
   .lead { color: var(--dim); font-size: 19px; max-width: 640px; margin: 0; }
 
+  /* Symmetry: every section opens with a centered eyebrow, headline and intro. */
+  section > .wrap > .eyebrow, section > .wrap > h2 { text-align: center; }
+  section > .wrap > .lead { text-align: center; margin-left: auto; margin-right: auto; }
+  .split-intro { text-align: center; max-width: 760px; margin: 0 auto 44px; }
+  .split-intro .lead { margin: 0 auto; }
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 50px; }
   @media (max-width: 900px) { .steps { grid-template-columns: 1fr; } }
   .steps > *, .bento > *, .split > *, .formats > * { min-width: 0; }
@@ -174,7 +180,7 @@
     <a class="brand" href="#" aria-label="cardbox home"><img src="media/logo.svg" alt="">cardbox</a>
     <div class="links">
       <a class="opt" href="#how">How it works</a>
-      <a class="opt" href="#ways">No AI needed</a>
+      <a class="opt" href="#ways">No agent needed</a>
       <a class="opt" href="#usecases">Use cases</a>
       <a class="opt" href="#features">Features</a>
       <a class="opt" href="#mcp">MCP</a>
@@ -189,9 +195,9 @@
 
 <header class="hero">
   <div class="wrap">
-    <a class="badge" href="https://github.com/aryainguz/cardbox"><b>new</b> free · no paid AI needed · runs on your laptop →</a>
-    <h1>say it.<br><span class="hl">ship the video.</span></h1>
-    <p class="sub">Write what you want to say. <b>No paid AI, no editing.</b> cardbox makes the whole video: visuals, captions, music and the voice. <b>Yours, cloned.</b> Want more? Plug in your AI assistant.</p>
+    <a class="badge" href="https://github.com/aryainguz/cardbox"><b>open source</b> free · no paid AI needed · runs on your laptop →</a>
+    <h1>an agentic video editor<br>that works <span class="hl">without an agent.</span></h1>
+    <p class="sub">Write a few lines of text and get a finished video: visuals, captions, music and <b>your own cloned voice</b>. Free, on your computer. <b>Connect your AI agent</b> when you want it to do even more.</p>
     <div class="ctas">
       <a class="btn yellow" href="https://github.com/aryainguz/cardbox#quick-start">Make your first video</a>
       <a class="btn ghost" href="#how">How it works</a>
@@ -240,17 +246,17 @@
 <section id="ways" style="padding-top: 20px">
   <div class="wrap">
     <div class="eyebrow">two ways to use it</div>
-    <h2>free on its own.<br>more with your AI.</h2>
+    <h2>works without an agent.<br>does more with one.</h2>
     <div class="ways">
       <div class="way main">
         <div class="tag">the core · free</div>
-        <h3>Without AI</h3>
+        <h3>Without an agent</h3>
         <p>Write plain text, pick a look, make the video. No paid AI, no API keys, no account. It all runs on your computer.</p>
         <ul><li>Plain text in, finished MP4 out</li><li>Your cloned voice, or the computer's voice</li><li>Your own images and clips from a folder</li><li>Themes, formats, captions and music</li></ul>
       </div>
       <div class="way">
-        <div class="tag">optional · for more</div>
-        <h3>With your AI assistant</h3>
+        <div class="tag">optional · agentic</div>
+        <h3>With your AI agent</h3>
         <p>Connect Claude, Cursor or any MCP app and let it do the heavy lifting, with even more control.</p>
         <ul><li>Writes the script from one sentence</li><li>Finds openly licensed images, with credits</li><li>Picks animated scenes and times them to words</li><li>Looks at preview frames and fixes them</li></ul>
       </div>
@@ -278,13 +284,13 @@
     <div class="eyebrow">what's inside</div>
     <h2>small tool.<br>serious output.</h2>
     <div class="bento">
-      <div class="tile yellow w4">
+      <div class="tile yellow w3">
         <div class="emo">👂</div>
         <h3>It listens to itself</h3>
         <p>Cloned voices sometimes fumble a word. cardbox transcribes every line it speaks, compares it with your script, and re-records anything that comes out wrong. Automatically.</p>
         <div class="check">script: "Every line it speaks"<br>take 1: "<span class="bad">A V</span> line it speaks" → retry<br>take 2: "<span class="good">Every</span> line it speaks" ✓</div>
       </div>
-      <div class="tile w2"><div class="emo">🎙️</div><h3>Your voice, on your laptop</h3><p>Cloned locally from a minute of audio. A consent line is always recorded first.</p></div>
+      <div class="tile w3"><div class="emo">🎙️</div><h3>Your voice, on your laptop</h3><p>Read ten short lines, about a minute, and every video speaks in your voice. Cloned on your computer, with a consent line recorded first.</p></div>
       <div class="tile w2"><div class="emo">⏱️</div><h3>Animations hit on the word</h3><p>Write <code>on: billion</code>, and the counter starts the moment you say "billion".</p></div>
       <div class="tile w2"><div class="emo">🖼️</div><h3>Images you can use</h3><p>Openly licensed images only, from Openverse and Wikimedia Commons. Credits written for you.</p></div>
       <div class="tile w2"><div class="emo">🎵</div><h3>Music, no copyright strikes</h3><p>A soundtrack synthesized for every video, dipping under your voice.</p></div>
@@ -317,37 +323,40 @@
 </section>
 
 <section id="mcp">
-  <div class="wrap split">
-    <div>
-      <div class="eyebrow">mcp server</div>
-      <h2>want more? your AI assistant becomes a video studio.</h2>
-      <p class="lead">Optional: add cardbox to Claude, Cursor or any MCP client. It writes the script, looks at preview frames before rendering, finds images, helps you record your voice, and renders.</p>
+  <div class="wrap">
+    <div class="split-intro">
+      <div class="eyebrow">the agentic part · optional</div>
+      <h2>connect an agent.<br>it edits for you.</h2>
+      <p class="lead">Add cardbox to Claude, Cursor or any MCP client. Your agent writes the script, looks at preview frames before rendering, finds images, helps you record your voice, and renders.</p>
+    </div>
+    <div class="split">
 <pre><span class="c">// claude_desktop_config.json · .cursor/mcp.json</span>
 {
   <span class="k">"mcpServers"</span>: {
     <span class="k">"cardbox"</span>: { <span class="k">"command"</span>: <span class="s">"cardbox"</span>, <span class="k">"args"</span>: [<span class="s">"mcp"</span>] }
   }
 }</pre>
-    </div>
-    <div class="tools">
-      <div class="tool">make_video<small>plain text in, video out</small></div>
-      <div class="tool">preview_beat<small>a frame the AI can look at</small></div>
-      <div class="tool">render_reel<small>MP4 + caption + credits</small></div>
-      <div class="tool">search_images<small>reusable licenses only</small></div>
-      <div class="tool">voice_record<small>opens the recording studio</small></div>
-      <div class="tool">voice_test<small>speak and verify a line</small></div>
-      <div class="tool">create_reel<small>full control over scenes</small></div>
-      <div class="tool">guide<small>how to write a good video</small></div>
+      <div class="tools">
+        <div class="tool">make_video<small>plain text in, video out</small></div>
+        <div class="tool">preview_beat<small>a frame the agent can see</small></div>
+        <div class="tool">render_reel<small>MP4 + caption + credits</small></div>
+        <div class="tool">search_images<small>reusable licenses only</small></div>
+        <div class="tool">voice_record<small>opens the recording studio</small></div>
+        <div class="tool">create_reel<small>full control over scenes</small></div>
+      </div>
     </div>
   </div>
 </section>
 
 <section id="api" style="padding-top: 20px">
-  <div class="wrap split">
-    <div>
-      <div class="eyebrow">render api, in go</div>
+  <div class="wrap">
+    <div class="split-intro">
+      <div class="eyebrow">for developers · go render api</div>
       <h2>run it as a service.</h2>
       <p class="lead">A Go server that queues renders, streams their progress live and hands back the video. One binary and SQLite.</p>
+    </div>
+    <div class="split">
+      <div>
       <ul class="list">
         <li><b>Worker pool and bounded queue</b>, with backpressure, cancellation and a graceful drain on shutdown</li>
         <li><b>Live progress</b> over Server-Sent Events, to any number of watchers</li>
@@ -355,7 +364,7 @@
         <li><b>Signed webhooks</b> (HMAC-SHA256) with retries and backoff</li>
         <li><b>API keys, rate limits</b>, request IDs, JSON logs, Prometheus metrics</li>
       </ul>
-    </div>
+      </div>
 <pre><span class="c"># submit</span>
 $ curl -X POST localhost:8080/v1/renders \
     -H <span class="s">"Content-Type: application/yaml"</span> \
@@ -370,6 +379,7 @@ $ curl -N localhost:8080/v1/renders/rnd_e3016b6c59a9/events
 
 <span class="c"># download</span>
 $ curl -O localhost:8080/v1/renders/rnd_e3016b6c59a9/video</pre>
+    </div>
   </div>
 </section>
 
