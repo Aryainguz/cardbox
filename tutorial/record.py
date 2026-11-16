@@ -66,7 +66,8 @@ NARRATION = [
      "And if you use an AI assistant like Claude or Cursor, add cardbox as an M C P server. Then just ask for a video, "
      "and it writes the script, finds images, and renders it for you."),
     ("Prefer the terminal? cardbox make turns a text file into a video, with one command.", None),
-    ("That's cardbox. It's free and open source, and the link is in the description. Happy making!", None),
+    ("And yes, I made this video with cardbox. The intro was rendered by it, and this voice isn't mine: cardbox cloned "
+     "it. It's free and open source, and the link is in the description. Happy making!", None),
 ]
 
 CURSOR_JS = """
@@ -159,7 +160,9 @@ def main() -> None:
     (home / "voices").mkdir(parents=True)
     if a.voice != "none":  # "none": a silent dry run to check the on-screen choreography
         shutil.copytree(Path(a.voice_home).expanduser() / "voices" / a.voice, home / "voices" / a.voice)
-    env = {**os.environ, "CARDBOX_HOME": str(home)}
+    # The recording uses its own workspace, for the commands it runs and for its own narration.
+    os.environ["CARDBOX_HOME"] = str(home)
+    env = {**os.environ}
     cardbox = str(Path(sys.executable).with_name("cardbox"))
 
     # Demo files: an image for "1.jpg" (generated, so there are no rights questions) and the CLI script.
@@ -304,8 +307,11 @@ def main() -> None:
             d.beat(15, cli)
 
             def outro():
-                page.goto(app_url)
-                page.wait_for_selector("#script")
+                page.goto((HERE.parent / "site" / "index.html").as_uri())
+                page.wait_for_timeout(800)
+                page.mouse.move(1000, 300, steps=20)
+                page.wait_for_timeout(1500)
+                d.move("a.btn.yellow")
             d.beat(16, outro)
             page.wait_for_timeout(1500)
             total = d.now()
@@ -314,6 +320,13 @@ def main() -> None:
             browser.close()
     finally:
         app.terminate()
+
+    print("rendering the intro with cardbox…", flush=True)
+    intro_spec = assets / "intro.yaml"
+    intro_spec.write_text((HERE / "intro.yaml").read_text().replace("title: cardbox tutorial",
+                                                                   f"title: cardbox tutorial\nvoice: {a.voice}"))
+    subprocess.run([cardbox, "render", str(intro_spec), "-o", str(out / "intro.mp4")], env=env, check=True,
+                   capture_output=True)
 
     print("mixing…", flush=True)
     bed = music.write(out / "music.wav", music.bed(total, cuts=[], mood="calm"))
@@ -337,7 +350,15 @@ def main() -> None:
     subprocess.run(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", ";".join(filt), "-map", "0:v", "-map", "[a]",
                     "-r", "30", "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p", "-c:a", "aac",
                     "-b:a", "192k", "-movflags", "+faststart", "-t", f"{total:.2f}", str(dest)], check=True)
-    print(f"done: {dest} ({total:.0f}s)")
+    # The intro (made by cardbox) in front of the screen recording.
+    final = out / "cardbox-tutorial-full.mp4"
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(out / "intro.mp4"), "-i", str(dest), "-filter_complex",
+                    "[0:v]fps=30,format=yuv420p[v0];[1:v]fps=30,format=yuv420p[v1];"
+                    "[0:a]aresample=44100,aformat=channel_layouts=stereo[a0];[1:a]aresample=44100,aformat=channel_layouts=stereo[a1];"
+                    "[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]", "-map", "[v]", "-map", "[a]", "-c:v", "libx264",
+                    "-preset", "slow", "-crf", "20", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(final)],
+                   check=True)
+    print(f"done: {final}")
 
 
 if __name__ == "__main__":

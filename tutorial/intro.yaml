@@ -1,0 +1,12 @@
+# The tutorial's opening, rendered by cardbox itself (record.py puts it in front of the screen recording).
+title: cardbox tutorial
+format: landscape
+handle: cardbox
+theme: midnight
+accent: "#FFE14D"
+music: calm
+beats:
+  - kind: scene
+    scene: logo
+    say: This is cardbox. In the next few minutes, I'll show you everything, from installing it and opening the app, to making and downloading your first video.
+    params: {name: cardbox, tagline: the full tutorial, on: cardbox}
