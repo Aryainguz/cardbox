@@ -117,12 +117,28 @@ class Profile:
         (self.dir / "reference.wav").unlink(missing_ok=True)  # rebuilt on next use
         return q
 
+    def good_takes(self) -> list[Path]:
+        """Takes that passed the quality check (takes recorded before checks existed count as good)."""
+        meta = self.meta().get("takes", {})
+        return [t for t in self.takes() if meta.get(t.stem, {}).get("ok", True)]
+
+    def recheck(self) -> dict:
+        """Re-judges every take with the current quality thresholds (useful after they change)."""
+        meta = self.meta()
+        for t in self.takes():
+            q = assess(decode(t))
+            meta.setdefault("takes", {})[t.stem] = asdict(q) | {"ok": q.ok}
+        self.meta_path.write_text(json.dumps(meta, indent=2))
+        (self.dir / "reference.wav").unlink(missing_ok=True)
+        return self.status()
+
     def status(self) -> dict:
         meta = self.meta().get("takes", {})
         done = [int(p.stem) for p in self.takes()]
+        good = len(self.good_takes())
         return {
-            "voice": self.name, "consent": self.consented, "recorded": len(done), "needed": MIN_TAKES,
-            "total_prompts": len(PROMPTS), "ready": self.consented and len(done) >= MIN_TAKES,
+            "voice": self.name, "consent": self.consented, "recorded": len(done), "good": good, "needed": MIN_TAKES,
+            "total_prompts": len(PROMPTS), "ready": self.consented and good >= MIN_TAKES,
             "takes": {k: {"ok": v.get("ok"), "issues": v.get("issues", [])} for k, v in sorted(meta.items())},
             "next_prompt": next((i for i in range(len(PROMPTS)) if i not in done), None),
         }
@@ -132,11 +148,11 @@ class Profile:
         st = self.status()
         if not st["ready"]:
             raise RuntimeError(f"voice {self.name!r} isn't ready: record the consent line and at least "
-                               f"{MIN_TAKES} takes first (`cardbox voice record {self.name}`)")
+                               f"{MIN_TAKES} good takes first (`cardbox voice record {self.name}`)")
         ref = self.dir / "reference.wav"
         if ref.exists():
             return ref
-        takes = self.takes()
+        takes = self.good_takes()  # a take that failed the quality check never goes into the voice
         args = sum((["-i", str(t)] for t in takes), [])
         chain = "".join(f"[{i}:a]" for i in range(len(takes)))
         subprocess.run(["ffmpeg", "-v", "error", "-y", *args, "-filter_complex",

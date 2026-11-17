@@ -154,5 +154,8 @@ def speak(lines: list[Line], voice: str, cache: Path, settings: dict | None = No
         secs = duration(f)
         cap = words(ln.say)
         times = map_words(cap, [tuple(w) for w in heard["words"]], secs) if heard["words"] else spread(ln.say, secs)
-        takes.append(Take(f, secs, times, heard.get("score"), heard.get("text", "")))
+        score = heard.get("score")
+        if heard.get("errors"):  # any wrong word marks the line as needing a look, whatever its score
+            score = min(score or 1.0, 0.96)
+        takes.append(Take(f, secs, times, score, heard.get("text", "")))
     return takes

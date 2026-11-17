@@ -49,3 +49,24 @@ def test_match_score_ignores_word_splitting(expected, heard):
 
 def test_match_score_still_catches_paid_vs_paired():
     assert match_score("You don't need any paid AI to use it", "You don't need any paired AI to use it") < 0.97
+
+
+def test_one_wrong_word_in_a_long_line_is_an_error():
+    from cardbox.voice.align import word_errors
+
+    script = ("Write what you want to say, one paragraph for each scene. The first paragraph is your hook and the last "
+              "one is your ending. You don't need any paid AI for this, just write.")
+    heard = script.replace("paid", "paired")
+    assert match_score(script, heard) > 0.97  # the old percentage check let this through
+    assert word_errors(script, heard) == 1
+
+
+@pytest.mark.parametrize("expected,heard", [
+    ("Name a file one dot jpg, and it goes behind the first beat.", "Name a file, 1.jpg and it goes behind the first beat."),
+    ("My open-source tool did.", "My open source tool did."),
+    ("Mention three hundred sixty thousand", "Mention 360,000"),
+])
+def test_writing_differences_are_not_errors(expected, heard):
+    from cardbox.voice.align import word_errors
+
+    assert word_errors(expected, heard) == 0

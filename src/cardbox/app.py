@@ -51,7 +51,7 @@ def voices() -> list[dict]:
     out = []
     for name in Profile.all():
         st = Profile(name).status()
-        out.append({"name": name, "ready": st["ready"], "recorded": st["recorded"], "total": st["total_prompts"]})
+        out.append({"name": name, "ready": st["ready"], "recorded": st["good"], "total": st["total_prompts"]})
     return out
 
 

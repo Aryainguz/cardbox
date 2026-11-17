@@ -224,7 +224,8 @@ function renderOptions() {
     $('theme').appendChild(b);
   }
   const fill = (id, values, labels = {}) => { $(id).innerHTML = values.map((v) => `<option value="${v}">${labels[v] || v}</option>`).join(''); $(id).value = choice[id]; };
-  const vnames = ['auto', ...S.voices.filter((v) => v.ready).map((v) => v.name), 'system', 'none'];
+  const usable = S.cloning ? S.voices.filter((v) => v.ready).map((v) => v.name) : [];  // own voices need the voice extras
+  const vnames = ['auto', ...usable, 'system', 'none'];
   if (!vnames.includes(choice.voice)) vnames.unshift(choice.voice);
   fill('voice', vnames, { auto: 'Automatic (my voice if recorded)', system: 'Computer voice', none: 'No voice (silent preview)', ...Object.fromEntries(S.voices.map((v) => [v.name, `My voice (${v.name})`])) });
   fill('music', O.music); fill('captions', O.captions);

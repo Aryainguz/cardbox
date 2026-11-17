@@ -59,19 +59,24 @@
 <script>
 const DATA = __DATA__;
 let i = 0, status = null, rec = null, chunks = [], stream = null, raf = 0;
+// The tick is the user's agreement for this session; the server records consent once line 1 is saved.
+let agreed = false;
 const $ = (id) => document.getElementById(id);
 
 async function refresh() {
   status = await (await fetch('/status')).json();
-  $('agree').checked = status.consent; $('consentRow').hidden = status.consent && i > 0;
+  const consent = status.consent || agreed;
+  $('agree').checked = consent; $('consentRow').hidden = status.consent && i > 0;
   $('step').textContent = i === 0 ? 'Consent · line 1 of ' + DATA.prompts.length : 'Line ' + (i + 1) + ' of ' + DATA.prompts.length;
   $('prompt').textContent = DATA.prompts[i];
-  $('dots').innerHTML = DATA.prompts.map((_, k) => '<span class="' + (status.takes[String(k).padStart(2, '0')] ? 'done' : '') + (k === i ? ' cur' : '') + '"></span>').join('');
+  $('dots').innerHTML = DATA.prompts.map((_, k) => '<span class="' + ((status.takes[String(k).padStart(2, '0')] || {}).ok ? 'done' : '') + (k === i ? ' cur' : '') + '"></span>').join('');
   const has = status.takes[String(i).padStart(2, '0')];
   $('play').hidden = !has; if (has) $('play').src = '/take/' + String(i).padStart(2, '0') + '.wav?' + Date.now();
-  $('rec').disabled = i === 0 ? !$('agree').checked : !status.consent;
+  $('rec').disabled = i === 0 ? !consent : !status.consent;
+  if (i > 0 && !status.consent && !$('result').dataset.locked) $('result').innerHTML = '<span class="bad">Record the consent line (line 1) first.</span>';
+  else if (i === 0 && !consent && !$('result').dataset.locked) $('result').textContent = 'Tick the box above to start.';
   $('prev').disabled = i === 0; $('next').disabled = i === DATA.prompts.length - 1;
-  if (status.ready && !$('result').dataset.locked) $('result').innerHTML = '<span class="good">✓ Enough to clone your voice (' + status.recorded + ' lines). More lines make it sound more like you.</span>';
+  if (status.ready && !$('result').dataset.locked) $('result').innerHTML = '<span class="good">✓ Enough to clone your voice (' + status.good + ' good lines). More lines make it sound more like you.</span>';
 }
 
 function meter() {
@@ -84,13 +89,27 @@ function meter() {
 
 $('rec').onclick = async () => {
   if (rec && rec.state === 'recording') { rec.stop(); return; }
-  stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+  if (!navigator.mediaDevices || !window.MediaRecorder) {
+    $('result').innerHTML = '<span class="bad">This browser can\'t record audio. Try Chrome, Edge, Firefox or Safari.</span>'; return;
+  }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+  } catch (e) {
+    const why = e && e.name === 'NotFoundError' ? 'No microphone was found. Plug one in and try again.'
+      : 'Microphone access was blocked. Click the icon at the left of the address bar, allow the microphone for this page, then press Record again.';
+    $('result').innerHTML = '<span class="bad">' + why + '</span>'; return;
+  }
   const ctx = meter(); chunks = [];
   rec = new MediaRecorder(stream); rec.ondataavailable = (e) => chunks.push(e.data);
   rec.onstop = async () => {
     cancelAnimationFrame(raf); ctx.close(); stream.getTracks().forEach((t) => t.stop()); $('level').style.width = '0';
     $('rec').classList.remove('on'); $('rec').textContent = '● Record'; $('result').textContent = 'Checking…';
-    const r = await (await fetch('/take/' + i, { method: 'POST', body: new Blob(chunks, { type: rec.mimeType }) })).json();
+    let r;
+    try {
+      r = await (await fetch('/take/' + i, { method: 'POST', body: new Blob(chunks, { type: rec.mimeType || 'audio/webm' }) })).json();
+    } catch (e) {
+      r = { error: 'Couldn\'t save that take. Is cardbox still running? Then press Record again.' };
+    }
     $('result').dataset.locked = '1';
     $('result').innerHTML = r.error ? '<span class="bad">' + r.error + '</span>' : r.ok
       ? '<span class="good">✓ Sounds good (' + r.seconds + 's)</span>' : '<span class="bad">Try again: ' + r.issues.join('; ') + '</span>';
@@ -99,7 +118,7 @@ $('rec').onclick = async () => {
   };
   rec.start(); $('rec').classList.add('on'); $('rec').textContent = '■ Stop'; $('result').textContent = 'Recording… press Stop when you finish the line.';
 };
-$('agree').onchange = refresh;
+$('agree').onchange = () => { agreed = $('agree').checked; refresh(); };
 $('prev').onclick = () => { i = Math.max(0, i - 1); refresh(); };
 $('next').onclick = () => { i = Math.min(DATA.prompts.length - 1, i + 1); refresh(); };
 refresh().then(() => { if (status.next_prompt !== null && status.consent) { i = status.next_prompt; refresh(); } });

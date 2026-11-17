@@ -18,7 +18,7 @@ import os
 import sys
 from pathlib import Path
 
-from .align import match_score
+from .align import match_score, word_errors
 
 WHISPER_MODEL = os.environ.get("CARDBOX_WHISPER_MODEL", "base.en")
 
@@ -79,22 +79,27 @@ def run(spec: dict) -> list[dict]:
             else:
                 tmp = out  # the take already exists (system voice): only listen
             heard_text, heard = listener(tmp) if listener else ("", [])
-            score = match_score(job.get("expect", job["text"]), heard_text) if listener else 1.0
-            if best is None or score > best["score"]:
+            expect = job.get("expect", job["text"])
+            score = match_score(expect, heard_text) if listener else 1.0
+            errors = word_errors(expect, heard_text) if listener else 0
+            # Best take = fewest wrong words, then the closest overall.
+            if best is None or (errors, -score) < (best["errors"], -best["score"]):
                 if best and best["file"] != out and os.path.exists(best["file"]):
                     os.remove(best["file"])
-                best = {"file": tmp, "score": score, "seed": seed, "heard": heard, "text": heard_text, "attempts": attempt + 1}
+                best = {"file": tmp, "score": score, "errors": errors, "seed": seed, "heard": heard, "text": heard_text,
+                        "attempts": attempt + 1}
             elif tmp != out:
                 os.remove(tmp)
-            # One wrong word in a ten-word line already scores ~0.9 and can flip the meaning
-            # ("AI did" → "yeah I did"), so anything short of a near-exact match is retried.
-            if score >= spec.get("min_score", 0.97):
+            # Any wrong word is retried: one is enough to flip the meaning ("AI did" → "yeah I did").
+            if errors <= spec.get("max_errors", 0):
                 break
         assert best is not None
         if best["file"] != out:
             os.replace(best["file"], out)
-        Path(out + ".heard.json").write_text(json.dumps({"text": best["text"], "words": best["heard"], "score": best["score"]}))
-        report.append({"out": out, "score": round(best["score"], 3), "seed": best["seed"], "best_attempt": best["attempts"],
+        Path(out + ".heard.json").write_text(json.dumps({"text": best["text"], "words": best["heard"], "score": best["score"],
+                                                         "errors": best["errors"]}))
+        report.append({"out": out, "score": round(best["score"], 3), "errors": best["errors"], "seed": best["seed"],
+                       "best_attempt": best["attempts"],
                        "tries": attempt + 1, "heard": best["text"]})
         print(json.dumps(report[-1]), file=sys.stderr, flush=True)
     return report

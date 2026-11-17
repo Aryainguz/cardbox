@@ -46,7 +46,7 @@ NARRATION = [
     ("Now just type cardbox. That's it. The app opens in your browser, and everything runs on your own computer.", None),
     ("Click new video. You get a sample script, ready to edit.", None),
     ("Write what you want to say, one paragraph for each scene. The first paragraph is your hook, and the last one is "
-     "your ending. You don't need any paid AI for this. Just write.", None),
+     "your ending. You don't need to pay for any AI for this. Just write.", None),
     ("A line that starts with a hash sets the headline on screen. If it starts with a number, like three channels, "
      "it becomes a big number card.", None),
     ("Now pick the format. Vertical for Reels and Shorts, landscape for YouTube, and square for LinkedIn. "

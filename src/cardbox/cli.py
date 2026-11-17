@@ -89,6 +89,9 @@ def _voice(a: argparse.Namespace) -> None:
         serve_forever(a.name)
     elif a.action == "status":
         print(json.dumps(Profile(a.name).status(), indent=2))
+    elif a.action == "recheck":
+        st = Profile(a.name).recheck()
+        print(f"{st['good']}/{st['recorded']} takes pass the quality check · ready: {st['ready']}")
     elif a.action == "list":
         print("\n".join(Profile.all()) or "no voices recorded yet: cardbox voice record")
     elif a.action == "test":
@@ -199,7 +202,7 @@ def main(argv: list[str] | None = None) -> None:
     p.set_defaults(fn=_preview)
 
     p = sub.add_parser("voice", help="record, check and test voices")
-    p.add_argument("action", choices=["record", "status", "list", "test"])
+    p.add_argument("action", choices=["record", "status", "list", "test", "recheck"])
     p.add_argument("name", nargs="?", default="default", help="voice name (for test: the text to speak)")
     p.add_argument("--voice", default="default", help="voice to test with")
     p.set_defaults(fn=_voice)

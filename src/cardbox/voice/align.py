@@ -85,17 +85,30 @@ def numbers_to_digits(tokens: list[str]) -> list[str]:
     return out
 
 
+def _tokens(text: str) -> list[str]:
+    # Hyphens and run-together capitals are word breaks: "open-source" = "open source" and a
+    # recognizer's "GoRender" = "Go render". A dot inside a word is spoken: "1.jpg" = "one dot jpg".
+    # Without this, correct takes get retried for nothing.
+    text = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", text).replace("-", " ")
+    text = re.sub(r"(?<=\w)\.(?=\w)", " dot ", text)
+    spoken = [w.lower().strip(",.?!:;\"'()") for w in text.split()]
+    return [norm(w) for w in numbers_to_digits(spoken) if norm(w)]
+
+
+def word_errors(expected: str, heard: str) -> int:
+    """How many script words were said wrong or skipped (plus extra words heard). One is enough to
+    fail a take: a single wrong word ("paid" → "paired") can change the meaning of a long line."""
+    errors = 0
+    for op, i1, i2, j1, j2 in difflib.SequenceMatcher(a=_tokens(expected), b=_tokens(heard), autojunk=False).get_opcodes():
+        if op != "equal":
+            errors += max(i2 - i1, j2 - j1)
+    return errors
+
+
 def match_score(expected: str, heard: str) -> float:
     """How closely a transcript matches the script (0..1), ignoring case, punctuation and how
     numbers are written."""
-    def tokens(text: str) -> list[str]:
-        # Hyphens and run-together capitals are word breaks: "open-source" = "open source" and a
-        # recognizer's "GoRender" = "Go render". Without this, correct takes get retried for nothing.
-        text = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", text).replace("-", " ")
-        spoken = [w.lower().strip(",.?!:;\"'()") for w in text.split()]
-        return [norm(w) for w in numbers_to_digits(spoken) if norm(w)]
-
-    a, b = tokens(expected), tokens(heard)
+    a, b = _tokens(expected), _tokens(heard)
     if not a:
         return 1.0
     return difflib.SequenceMatcher(a=a, b=b, autojunk=False).ratio()

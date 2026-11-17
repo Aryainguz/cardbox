@@ -39,3 +39,16 @@ def test_consent_comes_first():
 def test_new_profile_is_not_ready():
     st = Profile("me").status()
     assert st["ready"] is False and st["consent"] is False and st["next_prompt"] == 0
+
+
+def test_failed_takes_do_not_count_toward_ready(tmp_path):
+    import json
+
+    p = Profile("me")
+    for i in range(5):
+        p.take_path(i).write_bytes(b"x")
+    meta = {"consent": True, "takes": {f"{i:02d}": {"ok": i < 3} for i in range(5)}}
+    p.meta_path.write_text(json.dumps(meta))
+    st = p.status()
+    assert st["recorded"] == 5 and st["good"] == 3 and st["ready"] is False
+    assert [t.stem for t in p.good_takes()] == ["00", "01", "02"]
