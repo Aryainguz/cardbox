@@ -107,6 +107,8 @@ pipx install cardbox-video && cardbox   # opens the app in your browser
 That's it if you have Google Chrome. Otherwise run `python -m playwright install chromium` once.
 (`pip install cardbox-video` works too; `pipx` keeps it in its own environment.)
 
+> **`command not found: cardbox`?** First time using pipx: run `pipx ensurepath`, then open a new terminal.
+
 **Requirements**
 
 | | |
@@ -126,7 +128,7 @@ The app does everything without commands. You write the script, pick a format, t
 **Your own voice.** Click *Record my voice* in the app (about a minute of reading). Cloning needs the voice extras:
 
 ```bash
-pip install "cardbox-video[voice]"            # Chatterbox + Whisper (PyTorch; Apple Silicon or a GPU recommended)
+pipx install --python python3.12 "cardbox-video[voice]"   # Chatterbox + Whisper (PyTorch: use Python 3.10–3.12)
 ```
 
 > The voice stack is heavy. To keep PyTorch out of your main environment, install `cardbox-video[voice]` in a separate one and point `CARDBOX_VOICE_PYTHON` at its interpreter.
