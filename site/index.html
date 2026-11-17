@@ -206,7 +206,7 @@
 
     <div class="stage">
       <div class="screen">
-        <video id="promo" src="media/cardbox-explainer.mp4" poster="media/cardbox-explainer.jpg" muted loop playsinline autoplay preload="metadata"
+        <video id="promo" src="media/cardbox-explainer.mp4" poster="media/cardbox-explainer.jpg" muted loop playsinline webkit-playsinline autoplay preload="auto"
           aria-label="How to use cardbox, explained in a video made with cardbox and narrated in a cloned voice"></video>
         <button class="btn yellow small play" id="sound" type="button">🔊 Play with sound</button>
       </div>
@@ -404,11 +404,33 @@ $ curl -O localhost:8080/v1/renders/rnd_e3016b6c59a9/video</pre>
   row.innerHTML += row.innerHTML;
   // The hero video plays muted; one tap restarts it with sound.
   const video = document.getElementById('promo'), sound = document.getElementById('sound');
-  // Autoplay muted (browsers allow that), unless the visitor asked for reduced motion.
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { video.removeAttribute('autoplay'); video.pause(); }
-  else { video.muted = true; video.play().catch(() => {}); }
-  sound.addEventListener('click', () => {
-    video.muted = false; video.loop = false; video.currentTime = 0; video.controls = true; video.play(); sound.remove();
+  video.defaultMuted = true;
+  video.muted = true;
+
+  function tryPlay() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.removeAttribute('autoplay');
+      video.pause();
+    } else if (video.paused) {
+      video.play().catch(() => {});
+    }
+  }
+
+  tryPlay();
+  video.addEventListener('loadeddata', tryPlay);
+  video.addEventListener('canplay', tryPlay);
+  ['touchstart', 'click', 'scroll'].forEach((evt) => {
+    window.addEventListener(evt, tryPlay, { once: true, passive: true });
+  });
+
+  sound.addEventListener('click', (e) => {
+    e.stopPropagation();
+    video.muted = false;
+    video.loop = false;
+    video.currentTime = 0;
+    video.controls = true;
+    video.play();
+    sound.remove();
   });
 </script>
 </body>

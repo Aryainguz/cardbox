@@ -6,6 +6,7 @@ __pycache__/
 dist/
 build/
 *.mp4
+!site/media/*.mp4
 caption.txt
 .DS_Store
 data/
