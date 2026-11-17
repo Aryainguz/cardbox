@@ -203,10 +203,15 @@ function renderList() {
     b.onclick = () => open(r.name); $('reels').appendChild(b);
   }
   const v = S.voices[0];
-  const hintCmd = S.is_pipx ? 'pipx inject cardbox-video "cardbox-video[voice]"' : 'pip install "cardbox-video[voice]"';
+  let statusText = '';
+  if (v) {
+    statusText = v.ready ? 'Ready to use' : `${v.recorded}/${v.total} lines recorded (record 4+ to use)`;
+  } else {
+    statusText = 'Read 10 short lines (about a minute) and every video can sound like you.';
+  }
   $('voicebox').innerHTML = v
-    ? `<b>🎙️ Voice: ${v.name}</b><small>${v.ready ? 'Ready to use' : `${v.recorded}/${v.total} lines recorded`}${S.cloning ? '' : ` · run: <code>${hintCmd}</code> to clone`}</small>`
-    : `<b>🎙️ Your voice</b><small>Read 10 short lines (about a minute) and every video can sound like you.${S.cloning ? '' : ` · needs: <code>${hintCmd}</code>`}</small>`;
+    ? `<b>🎙️ Voice: ${v.name}</b><small>${statusText}</small>`
+    : `<b>🎙️ Your voice</b><small>${statusText}</small>`;
   const rec = document.createElement('button'); rec.className = 'btn sm'; rec.textContent = v ? 'Record more' : 'Record my voice';
   rec.onclick = () => recordVoice(v ? v.name : 'me'); $('voicebox').appendChild(rec);
 }
@@ -225,14 +230,14 @@ function renderOptions() {
     $('theme').appendChild(b);
   }
   const fill = (id, values, labels = {}) => { $(id).innerHTML = values.map((v) => `<option value="${v}">${labels[v] || v}</option>`).join(''); $(id).value = choice[id]; };
-  const usable = S.cloning ? S.voices.filter((v) => v.ready).map((v) => v.name) : [];  // own voices need the voice extras
-  const vnames = ['auto', ...usable, 'system', 'none'];
+  const readyVoices = S.voices.filter((v) => v.ready).map((v) => v.name);
+  const vnames = ['auto', ...readyVoices, 'system', 'none'];
   if (!vnames.includes(choice.voice)) vnames.unshift(choice.voice);
   fill('voice', vnames, {
-    auto: S.cloning ? 'Automatic (my voice if recorded)' : 'Automatic (computer voice)',
+    auto: readyVoices.length ? `Automatic (${readyVoices[0]} voice)` : 'Automatic (computer voice)',
     system: 'Computer voice',
     none: 'No voice (silent preview)',
-    ...Object.fromEntries(S.voices.map((v) => [v.name, S.cloning ? `My voice (${v.name})` : `My voice (${v.name}) · needs voice extras`]))
+    ...Object.fromEntries(S.voices.map((v) => [v.name, `My voice (${v.name})${v.ready ? '' : ' (record 4+ lines)'}`]))
   });
   fill('music', O.music); fill('captions', O.captions);
   $('handle').value = choice.handle || '';

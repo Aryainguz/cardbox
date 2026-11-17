@@ -143,10 +143,10 @@ def speak(lines: list[Line], voice: str, cache: Path, settings: dict | None = No
                     Path(str(files[i]) + ".heard.json").write_text(json.dumps({"text": "", "words": [], "score": None}))
         else:
             if not stack.get("chatterbox"):
-                is_pipx = "pipx" in sys.executable or "pipx" in os.environ.get("VIRTUAL_ENV", "")
-                cmd = "pipx inject cardbox-video 'cardbox-video[voice]'" if is_pipx else "pip install 'cardbox-video[voice]'"
-                raise RuntimeError(f"voice cloning needs the voice extras: run `{cmd}` "
-                                   f"(or point CARDBOX_VOICE_PYTHON at an environment that has them)")
+                raise RuntimeError(
+                    f"voice cloning model (chatterbox) not found in {voice_python()}. "
+                    "Run 'cardbox doctor' or reinstall with 'pipx install --force cardbox-video'."
+                )
             ref = Profile(voice).reference()
             jobs = [{"text": lines[i].speak, "expect": lines[i].say, "out": str(files[i]), "seed": 7 + i} for i in todo]
             log(f"  cloning {len(jobs)} line(s) in voice '{voice}' (each take is checked and retried if words are off)")

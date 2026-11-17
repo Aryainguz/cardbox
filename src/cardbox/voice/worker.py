@@ -59,8 +59,16 @@ def run(spec: dict) -> list[dict]:
     if spec.get("engine") == "chatterbox":
         try:
             import perth
+
+            class _DummyWatermarker:
+                def apply_watermark(self, wav, sample_rate=None):
+                    return wav
+
+                def get_watermark(self, wav, sample_rate=None):
+                    return 0.0
+
             if getattr(perth, "PerthImplicitWatermarker", None) is None:
-                perth.PerthImplicitWatermarker = getattr(perth, "DummyWatermarker", lambda: None)
+                perth.PerthImplicitWatermarker = getattr(perth, "DummyWatermarker", _DummyWatermarker)
         except Exception:  # noqa: BLE001
             pass
 
