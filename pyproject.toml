@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cardbox-video"
-version = "0.1.1"
+version = "0.1.2"
 description = "Plain text in, finished video out: narrated, captioned, animated videos in your own cloned voice. No paid AI needed; an MCP server lets any AI assistant drive it."
 readme = "README.md"
 license = { file = "LICENSE" }

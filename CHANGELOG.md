@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2
+
+- **Voice studio bug fixes**: fix consent checkbox reset loop and enable recording once ticked.
+- **Microphone & upload errors**: handle blocked or missing mic with friendly messages.
+- **Voice quality & readiness**: only takes passing quality checks count toward readiness; added `cardbox voice recheck`.
+- **Word-level voice validation**: fail narration takes with misspoken words.
+- **Docker build**: published to `ghcr.io/aryainguz/cardbox`.
+
 ## 0.1.1
 
 - README images and links now work on PyPI (absolute URLs).
