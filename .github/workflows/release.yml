@@ -1,10 +1,12 @@
 name: release
 on:
-  push:
-    tags: ["v*"]
+  release:
+    types: [published]
+  workflow_dispatch:
 
-# Publishes to PyPI with trusted publishing (no API token in the repo). One-time setup on pypi.org:
-# add this repository and the `release` workflow as a trusted publisher for the `cardbox-video` project.
+# Publishes to PyPI when a GitHub Release is published, with trusted publishing (no API token in the repo).
+# One-time setup on pypi.org → "Add a pending publisher": project cardbox-video, owner Aryainguz,
+# repository cardbox, workflow release.yml, environment pypi.
 jobs:
   build:
     runs-on: ubuntu-latest

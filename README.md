@@ -27,9 +27,9 @@
 
 ---
 
-https://github.com/aryainguz/cardbox/raw/main/site/media/cardbox-explainer.mp4
+<p align="center"><img src="site/media/demo.gif" alt="The cardbox app: a plain-text script becomes a finished video" width="860"></p>
 
-> **This explainer was made with cardbox.** The visuals and music are cardbox; the narration is my cloned voice, recorded in about a minute.
+<p align="center"><b><a href="https://aryainguz.github.io/cardbox">Watch the 80-second explainer</a></b>: made with cardbox, narrated in my cloned voice.</p>
 
 ## No paid AI needed
 
@@ -100,13 +100,24 @@ beats:
 
 ## Quick start
 
-Requirements: Python 3.10+, `ffmpeg`, and Chrome or Chromium.
-
 ```bash
-pip install cardbox-video
-python -m playwright install chromium   # skip if Google Chrome is installed
-cardbox                                 # opens the app in your browser
+pipx install cardbox-video && cardbox   # opens the app in your browser
 ```
+
+That's it if you have Google Chrome. Otherwise run `python -m playwright install chromium` once.
+(`pip install cardbox-video` works too; `pipx` keeps it in its own environment.)
+
+**Requirements**
+
+| | |
+| --- | --- |
+| Python | 3.10, 3.11 or 3.12 |
+| ffmpeg | `brew install ffmpeg` · `sudo apt install ffmpeg` · `winget install ffmpeg` |
+| A browser | Google Chrome, or Chromium via Playwright (used to draw frames) |
+| System voice (optional) | built into macOS; `espeak-ng` on Linux |
+| Voice cloning (optional) | `cardbox-video[voice]`: about 3 GB of models. Apple Silicon or an NVIDIA GPU recommended. On CPU it works, but each line takes a while |
+
+Tested on macOS (Apple Silicon) and Linux. Windows should work for everything except the system voice; reports welcome.
 
 <p align="center"><img src="site/media/app.jpg" alt="The cardbox app" width="820"></p>
 
@@ -194,6 +205,8 @@ cd server && go run ./cmd/cardbox-server     # or: docker compose up
 curl -X POST localhost:8080/v1/renders -H "Content-Type: application/yaml" --data-binary @video.yaml
 curl -N localhost:8080/v1/renders/<id>/events   # live progress (SSE)
 ```
+
+A ready image is published with every release: `docker run -p 8080:8080 ghcr.io/aryainguz/cardbox`.
 
 It has a bounded worker pool with backpressure, cancellation, graceful drain, SQLite persistence with crash recovery, idempotency keys, reuse of identical renders, HMAC-signed webhooks with retries, API keys, per-key rate limits and Prometheus metrics. Details are in [server/README.md](server/README.md).
 
