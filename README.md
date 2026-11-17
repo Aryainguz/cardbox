@@ -108,17 +108,6 @@ That's it! Everything — the video renderer, browser automation, and voice clon
 >
 > **`command not found: cardbox`?** First time using pipx: run `pipx ensurepath`, then open a new terminal.
 
-**Requirements**
-
-| | |
-| --- | --- |
-| Python | 3.10, 3.11 or 3.12 |
-| ffmpeg | `brew install ffmpeg` · `sudo apt install ffmpeg` · `winget install ffmpeg` |
-| A browser | Google Chrome, or Chromium via Playwright (used to draw frames) |
-| System voice (optional) | built into macOS; `espeak-ng` on Linux |
-| Voice cloning (optional) | `cardbox-video[voice]`: about 3 GB of models. Apple Silicon or an NVIDIA GPU recommended. On CPU it works, but each line takes a while |
-
-Tested on macOS (Apple Silicon) and Linux. Windows should work for everything except the system voice; reports welcome.
 
 <p align="center"><img src="https://aryainguz.github.io/cardbox/media/app.jpg" alt="The cardbox app" width="820"></p>
 
