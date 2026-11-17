@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import wave
 from pathlib import Path
 
 from .align import match_score, word_errors
@@ -47,6 +48,21 @@ class Listener:
         return r["text"].strip(), words
 
 
+def _save_wav(path: str, tensor: object, sample_rate: int) -> None:
+    import numpy as np
+
+    samples = tensor.detach().cpu().numpy()  # type: ignore[attr-defined]
+    if samples.ndim == 2:
+        samples = samples[0]
+    samples = np.clip(samples, -1.0, 1.0)
+    int16_samples = (samples * 32767).astype(np.int16)
+    with wave.open(path, "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(sample_rate)
+        wf.writeframes(int16_samples.tobytes())
+
+
 def run(spec: dict) -> list[dict]:
     jobs = spec.get("jobs", [])
     listener = None
@@ -72,7 +88,6 @@ def run(spec: dict) -> list[dict]:
         except Exception:  # noqa: BLE001
             pass
 
-        import torchaudio
         from chatterbox.tts import ChatterboxTTS
 
         model = ChatterboxTTS.from_pretrained(device=_device())
@@ -90,7 +105,7 @@ def run(spec: dict) -> list[dict]:
                 wav = model.generate(job["text"], audio_prompt_path=spec["reference"],
                                      exaggeration=spec.get("exaggeration", 0.45), cfg_weight=spec.get("cfg", 0.4))
                 tmp = out + f".try{attempt}.wav"
-                torchaudio.save(tmp, wav.cpu(), model.sr)
+                _save_wav(tmp, wav, model.sr)
             else:
                 tmp = out  # the take already exists (system voice): only listen
             heard_text, heard = listener(tmp) if listener else ("", [])
