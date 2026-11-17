@@ -1,2 +1,3 @@
 data/
-cardbox-server
+# The compiled binary (not the cmd/ source directory)
+/cardbox-server
