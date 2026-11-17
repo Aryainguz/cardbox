@@ -41,11 +41,12 @@ Follow for more tech, explained simply."""
 NARRATION = [
     ("Hey! In this tutorial, I'll show you how to make a complete video with cardbox, from installing it to posting it. "
      "First, install it with pip.", None),
-    ("Then run cardbox doctor. It checks that everything is ready: ffmpeg, the browser it draws with, and voice support.", None),
+    ("Then run cardbox doctor. It checks that everything is ready: the video tools, the browser it draws with, and voice "
+     "support.", None),
     ("Now just type cardbox. That's it. The app opens in your browser, and everything runs on your own computer.", None),
     ("Click new video. You get a sample script, ready to edit.", None),
-    ("Write what you want to say, one paragraph per beat. The first paragraph is your hook, and the last one is your "
-     "ending. You don't need any paid AI for this. Just write.", None),
+    ("Write what you want to say, one paragraph for each scene. The first paragraph is your hook, and the last one is "
+     "your ending. You don't need any paid AI for this. Just write.", None),
     ("A line that starts with a hash sets the headline on screen. If it starts with a number, like three channels, "
      "it becomes a big number card.", None),
     ("Now pick the format. Vertical for Reels and Shorts, landscape for YouTube, and square for LinkedIn. "
@@ -59,15 +60,15 @@ NARRATION = [
     ("And here's the video. Download it, and copy the caption. It's ready to post.", None),
     ("To use your own voice, open the voice panel, and read ten short lines, about one minute. cardbox clones your "
      "voice on your computer, and checks every line it speaks, re-recording any word that comes out wrong.", None),
-    ("Want full control? Open advanced, and edit the spec directly, with animated scenes and animations timed to "
-     "your words.", None),
+    ("If you want full control, open advanced, and edit the spec directly, with animated scenes and animations "
+     "timed to your words.", None),
     ("And if you use an AI assistant like Claude or Cursor, add cardbox as an MCP server. Then just ask for a video, "
      "and it writes the script, finds images, and renders it for you.",
      "And if you use an AI assistant like Claude or Cursor, add cardbox as an M C P server. Then just ask for a video, "
      "and it writes the script, finds images, and renders it for you."),
     ("Prefer the terminal? cardbox make turns a text file into a video, with one command.", None),
-    ("And yes, I made this video with cardbox. The intro was rendered by it, and this voice isn't mine: cardbox cloned "
-     "it. It's free and open source, and the link is in the description. Happy making!", None),
+    ("And yes, I made this video with cardbox. The intro was rendered by it, and this is not my real voice. cardbox "
+     "cloned it. It's free and open source, and the link is in the description. Happy making!", None),
 ]
 
 CURSOR_JS = """
