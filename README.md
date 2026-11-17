@@ -101,14 +101,10 @@ beats:
 ## Quick start
 
 ```bash
-# Basic (fast install, computer voice):
-pipx install cardbox-video && cardbox
-
-# Or with voice cloning (includes Chatterbox + Whisper models):
-pipx install "cardbox-video[voice]" && cardbox
+pipx install cardbox-video && cardbox   # opens the app in your browser
 ```
 
-> **Already installed without voice extras?** Run `pipx inject cardbox-video "cardbox-video[voice]"` anytime to add voice cloning.
+That's it! Everything — the video renderer, browser automation, and voice cloning stack (Chatterbox + Whisper) — is included. If you don't have Google Chrome, run `python -m playwright install chromium` once.
 >
 > **`command not found: cardbox`?** First time using pipx: run `pipx ensurepath`, then open a new terminal.
 
@@ -128,17 +124,9 @@ Tested on macOS (Apple Silicon) and Linux. Windows should work for everything ex
 
 The app does everything without commands. You write the script, pick a format, theme, voice and music, drop in your own images or clips, record your voice, preview every frame, and render. You can then watch the video, download it and copy its caption. Your videos live in `~/Cardbox`, shared with the CLI and the MCP server.
 
-**Your own voice.** Click *Record my voice* in the app (about a minute of reading). Cloning needs the voice extras:
+**Your own voice.** Click *Record my voice* in the app (about a minute of reading). Once recorded, your cloned voice is automatically used for your videos.
 
-```bash
-# If installed with pipx:
-pipx inject cardbox-video "cardbox-video[voice]"
-
-# If installed with pip:
-pip install "cardbox-video[voice]"
-```
-
-> The voice stack is heavy. To keep PyTorch out of your main environment, install `cardbox-video[voice]` in a separate one and point `CARDBOX_VOICE_PYTHON` at its interpreter.
+> The voice models run locally using PyTorch. Apple Silicon or an NVIDIA GPU is recommended for fastest generation.
 
 **Your own images and clips.** Drop them into the app, or into the video's `media/` folder. Name them `1.jpg`, `2.mp4`, … to use them for beat 1, 2, … or write `@ photo.jpg` inside a paragraph.
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- **Voice cloning out of the box**: Chatterbox TTS, Whisper, and setuptools are now included in standard dependencies. Users simply run `pipx install cardbox-video` to get full voice cloning without extra flags or inject steps.
+- **Watermarker fallback**: resilient fallback for `perth.PerthImplicitWatermarker` prevents `TypeError: 'NoneType' object is not callable` on newer Python environments.
+
 ## 0.1.3
 
 - **Graceful voice fallback**: `voice: auto` no longer crashes if voice cloning extras are missing; smoothly falls back to computer voice.

@@ -57,6 +57,13 @@ def run(spec: dict) -> list[dict]:
             print("whisper not installed: skipping checks and word timing", file=sys.stderr)
     model = None
     if spec.get("engine") == "chatterbox":
+        try:
+            import perth
+            if getattr(perth, "PerthImplicitWatermarker", None) is None:
+                perth.PerthImplicitWatermarker = getattr(perth, "DummyWatermarker", lambda: None)
+        except Exception:  # noqa: BLE001
+            pass
+
         import torchaudio
         from chatterbox.tts import ChatterboxTTS
 
