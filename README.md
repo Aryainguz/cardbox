@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="site/media/logo.svg" width="72" alt="cardbox logo">
+  <img src="https://aryainguz.github.io/cardbox/media/logo.svg" width="72" alt="cardbox logo">
 </p>
 
 <h1 align="center">cardbox</h1>
@@ -14,8 +14,8 @@
   <a href="https://aryainguz.github.io/cardbox">Website</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#use-it-from-your-ai-assistant-mcp">MCP</a> ·
-  <a href="docs/spec.md">Spec reference</a> ·
-  <a href="server/">Render API</a>
+  <a href="https://github.com/Aryainguz/cardbox/blob/main/docs/spec.md">Spec reference</a> ·
+  <a href="https://github.com/Aryainguz/cardbox/tree/main/server/">Render API</a>
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 ---
 
-<p align="center"><img src="site/media/demo.gif" alt="The cardbox app: a plain-text script becomes a finished video" width="860"></p>
+<p align="center"><img src="https://aryainguz.github.io/cardbox/media/demo.gif" alt="The cardbox app: a plain-text script becomes a finished video" width="860"></p>
 
 <p align="center"><b><a href="https://aryainguz.github.io/cardbox">Watch the 80-second explainer</a></b>: made with cardbox, narrated in my cloned voice.</p>
 
@@ -96,7 +96,7 @@ beats:
 - 🖼️ **License-safe images.** Search Openverse and Wikimedia Commons for reusable images only (CC0, public domain, CC BY, CC BY-SA). Credits are written into the post caption automatically.
 - 📐 **One script, every platform.** `format: landscape` re-lays out every beat for YouTube; `square` for the LinkedIn feed.
 - 🎵 **A soundtrack with no licensing questions.** A music bed is synthesized for each video (calm, upbeat or tense), with a hit on every cut and ducking under the voice.
-- 🛠️ **Runs as a service.** A Go [render API](server/) with a worker pool, live progress over SSE, signed webhooks, idempotency and Prometheus metrics.
+- 🛠️ **Runs as a service.** A Go [render API](https://github.com/Aryainguz/cardbox/tree/main/server/) with a worker pool, live progress over SSE, signed webhooks, idempotency and Prometheus metrics.
 
 ## Quick start
 
@@ -119,7 +119,7 @@ That's it if you have Google Chrome. Otherwise run `python -m playwright install
 
 Tested on macOS (Apple Silicon) and Linux. Windows should work for everything except the system voice; reports welcome.
 
-<p align="center"><img src="site/media/app.jpg" alt="The cardbox app" width="820"></p>
+<p align="center"><img src="https://aryainguz.github.io/cardbox/media/app.jpg" alt="The cardbox app" width="820"></p>
 
 The app does everything without commands. You write the script, pick a format, theme, voice and music, drop in your own images or clips, record your voice, preview every frame, and render. You can then watch the video, download it and copy its caption. Your videos live in `~/Cardbox`, shared with the CLI and the MCP server.
 
@@ -149,7 +149,7 @@ A complete walkthrough, recorded live on a laptop: installing, the app, writing 
 your own images, previewing, rendering, voice recording, the YAML spec, MCP and the CLI. The narration is the
 author's cloned voice.
 
-The recording itself is reproducible: [`tutorial/record.py`](tutorial/record.py) drives the real app in Chrome,
+The recording itself is reproducible: [`tutorial/record.py`](https://github.com/Aryainguz/cardbox/blob/main/tutorial/record.py) drives the real app in Chrome,
 runs the real commands, and narrates with a recorded voice.
 
 ## Use it from your AI assistant (MCP)
@@ -192,13 +192,13 @@ Then just ask: *"Make a 40-second vertical video explaining how DNS works, in my
 
 **Beat kinds:** `hook`, `text`, `stat`, `list`, `scene`, `end`. Hooks and text beats can take a `background` (an image with a slow push-in, or any scene).
 
-**Scenes (13):** `counter` · `donut` · `bars` · `flow` · `terminal` · `mesh` · `grid` · `photo` · `logo` · `chat` · `script` · `voice` · `formats`. See [docs/spec.md](docs/spec.md) for every parameter.
+**Scenes (13):** `counter` · `donut` · `bars` · `flow` · `terminal` · `mesh` · `grid` · `photo` · `logo` · `chat` · `script` · `voice` · `formats`. See [docs/spec.md](https://github.com/Aryainguz/cardbox/blob/main/docs/spec.md) for every parameter.
 
 **Pronunciation:** captions show `say`, but the voice reads `pronounce` when you set it. Write `say: SongsPK` with `pronounce: Songs P K`.
 
 ## Render API (Go)
 
-[`server/`](server/) is an HTTP service that queues renders and streams progress:
+[`server/`](https://github.com/Aryainguz/cardbox/tree/main/server/) is an HTTP service that queues renders and streams progress:
 
 ```bash
 cd server && go run ./cmd/cardbox-server     # or: docker compose up
@@ -208,7 +208,7 @@ curl -N localhost:8080/v1/renders/<id>/events   # live progress (SSE)
 
 A ready image is published with every release: `docker run -p 8080:8080 ghcr.io/aryainguz/cardbox`.
 
-It has a bounded worker pool with backpressure, cancellation, graceful drain, SQLite persistence with crash recovery, idempotency keys, reuse of identical renders, HMAC-signed webhooks with retries, API keys, per-key rate limits and Prometheus metrics. Details are in [server/README.md](server/README.md).
+It has a bounded worker pool with backpressure, cancellation, graceful drain, SQLite persistence with crash recovery, idempotency keys, reuse of identical renders, HMAC-signed webhooks with retries, API keys, per-key rate limits and Prometheus metrics. Details are in [server/README.md](https://github.com/Aryainguz/cardbox/blob/main/server/README.md).
 
 ## How it works
 
@@ -227,7 +227,7 @@ Voice cloning is powerful. cardbox records a consent statement as the first take
 
 ## Contributing
 
-New scenes, themes and caption styles are the easiest place to start: each scene is a single function in [`src/cardbox/scenes/library.js`](src/cardbox/scenes/library.js). See [CONTRIBUTING.md](CONTRIBUTING.md).
+New scenes, themes and caption styles are the easiest place to start: each scene is a single function in [`src/cardbox/scenes/library.js`](https://github.com/Aryainguz/cardbox/blob/main/src/cardbox/scenes/library.js). See [CONTRIBUTING.md](https://github.com/Aryainguz/cardbox/blob/main/CONTRIBUTING.md).
 
 ## Credits
 

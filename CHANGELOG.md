@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- README images and links now work on PyPI (absolute URLs).
+
 ## 0.1.0 (first release)
 
 - **The app:** run `cardbox` and it opens in your browser. Write a script, choose format and style, add images or
