@@ -64,3 +64,6 @@ testpaths = ["tests"]
 
 [tool.ruff.lint.per-file-ignores]
 "tutorial/*" = ["E501"]  # inline JavaScript for the recording overlay
+
+[tool.hatch.build.targets.sdist]
+exclude = ["site", "tutorial", "examples/promo/build", ".github"]
