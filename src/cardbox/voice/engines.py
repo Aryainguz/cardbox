@@ -107,14 +107,16 @@ def system_voice_available() -> bool:
 
 
 def resolve_voice(voice: str) -> str:
-    """'auto' → a recorded voice that's ready (preferring 'default', then 'me'), else the computer's voice,
-    else silence. So a first video always renders, and gets better once you record your voice."""
+    """'auto' → a recorded voice that's ready (preferring 'default', then 'me') if voice cloning
+    is installed, else the computer's voice, else silence. So a video always renders without errors."""
     if voice != "auto":
         return voice
-    ready = [n for n in Profile.all() if Profile(n).status()["ready"]]
-    for name in ("default", "me", *ready):
-        if name in ready:
-            return name
+    stack = has_voice_stack()
+    if stack.get("chatterbox"):
+        ready = [n for n in Profile.all() if Profile(n).status()["ready"]]
+        for name in ("default", "me", *ready):
+            if name in ready:
+                return name
     return "system" if system_voice_available() else "none"
 
 
@@ -141,8 +143,10 @@ def speak(lines: list[Line], voice: str, cache: Path, settings: dict | None = No
                     Path(str(files[i]) + ".heard.json").write_text(json.dumps({"text": "", "words": [], "score": None}))
         else:
             if not stack.get("chatterbox"):
-                raise RuntimeError("voice cloning needs the voice extras: pip install 'cardbox-video[voice]' "
-                                   "(or point CARDBOX_VOICE_PYTHON at an environment that has them)")
+                is_pipx = "pipx" in sys.executable or "pipx" in os.environ.get("VIRTUAL_ENV", "")
+                cmd = "pipx inject cardbox-video 'cardbox-video[voice]'" if is_pipx else "pip install 'cardbox-video[voice]'"
+                raise RuntimeError(f"voice cloning needs the voice extras: run `{cmd}` "
+                                   f"(or point CARDBOX_VOICE_PYTHON at an environment that has them)")
             ref = Profile(voice).reference()
             jobs = [{"text": lines[i].speak, "expect": lines[i].say, "out": str(files[i]), "seed": 7 + i} for i in todo]
             log(f"  cloning {len(jobs)} line(s) in voice '{voice}' (each take is checked and retried if words are off)")

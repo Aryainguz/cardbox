@@ -101,12 +101,15 @@ beats:
 ## Quick start
 
 ```bash
-pipx install cardbox-video && cardbox   # opens the app in your browser
+# Basic (fast install, computer voice):
+pipx install cardbox-video && cardbox
+
+# Or with voice cloning (includes Chatterbox + Whisper models):
+pipx install "cardbox-video[voice]" && cardbox
 ```
 
-That's it if you have Google Chrome. Otherwise run `python -m playwright install chromium` once.
-(`pip install cardbox-video` works too; `pipx` keeps it in its own environment.)
-
+> **Already installed without voice extras?** Run `pipx inject cardbox-video "cardbox-video[voice]"` anytime to add voice cloning.
+>
 > **`command not found: cardbox`?** First time using pipx: run `pipx ensurepath`, then open a new terminal.
 
 **Requirements**
@@ -128,7 +131,11 @@ The app does everything without commands. You write the script, pick a format, t
 **Your own voice.** Click *Record my voice* in the app (about a minute of reading). Cloning needs the voice extras:
 
 ```bash
-pipx install --python python3.12 "cardbox-video[voice]"   # Chatterbox + Whisper (PyTorch: use Python 3.10–3.12)
+# If installed with pipx:
+pipx inject cardbox-video "cardbox-video[voice]"
+
+# If installed with pip:
+pip install "cardbox-video[voice]"
 ```
 
 > The voice stack is heavy. To keep PyTorch out of your main environment, install `cardbox-video[voice]` in a separate one and point `CARDBOX_VOICE_PYTHON` at its interpreter.

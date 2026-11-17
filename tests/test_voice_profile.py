@@ -52,3 +52,11 @@ def test_failed_takes_do_not_count_toward_ready(tmp_path):
     st = p.status()
     assert st["recorded"] == 5 and st["good"] == 3 and st["ready"] is False
     assert [t.stem for t in p.good_takes()] == ["00", "01", "02"]
+
+
+def test_resolve_voice_auto_falls_back_when_cloning_unavailable(monkeypatch):
+    from cardbox.voice.engines import resolve_voice
+
+    monkeypatch.setattr("cardbox.voice.engines.has_voice_stack", lambda: {"chatterbox": False, "whisper": False})
+    # Even if voices exist, auto should not pick a voice that requires chatterbox
+    assert resolve_voice("auto") in ("system", "none")

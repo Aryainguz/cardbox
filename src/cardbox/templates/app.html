@@ -203,9 +203,10 @@ function renderList() {
     b.onclick = () => open(r.name); $('reels').appendChild(b);
   }
   const v = S.voices[0];
+  const hintCmd = S.is_pipx ? 'pipx inject cardbox-video "cardbox-video[voice]"' : 'pip install "cardbox-video[voice]"';
   $('voicebox').innerHTML = v
-    ? `<b>🎙️ Voice: ${v.name}</b><small>${v.ready ? 'Ready to use' : `${v.recorded}/${v.total} lines recorded`}${S.cloning ? '' : ' · install cardbox-video[voice] to clone'}</small>`
-    : `<b>🎙️ Your voice</b><small>Read 10 short lines (about a minute) and every video can sound like you.</small>`;
+    ? `<b>🎙️ Voice: ${v.name}</b><small>${v.ready ? 'Ready to use' : `${v.recorded}/${v.total} lines recorded`}${S.cloning ? '' : ` · run: <code>${hintCmd}</code> to clone`}</small>`
+    : `<b>🎙️ Your voice</b><small>Read 10 short lines (about a minute) and every video can sound like you.${S.cloning ? '' : ` · needs: <code>${hintCmd}</code>`}</small>`;
   const rec = document.createElement('button'); rec.className = 'btn sm'; rec.textContent = v ? 'Record more' : 'Record my voice';
   rec.onclick = () => recordVoice(v ? v.name : 'me'); $('voicebox').appendChild(rec);
 }
@@ -227,7 +228,12 @@ function renderOptions() {
   const usable = S.cloning ? S.voices.filter((v) => v.ready).map((v) => v.name) : [];  // own voices need the voice extras
   const vnames = ['auto', ...usable, 'system', 'none'];
   if (!vnames.includes(choice.voice)) vnames.unshift(choice.voice);
-  fill('voice', vnames, { auto: 'Automatic (my voice if recorded)', system: 'Computer voice', none: 'No voice (silent preview)', ...Object.fromEntries(S.voices.map((v) => [v.name, `My voice (${v.name})`])) });
+  fill('voice', vnames, {
+    auto: S.cloning ? 'Automatic (my voice if recorded)' : 'Automatic (computer voice)',
+    system: 'Computer voice',
+    none: 'No voice (silent preview)',
+    ...Object.fromEntries(S.voices.map((v) => [v.name, S.cloning ? `My voice (${v.name})` : `My voice (${v.name}) · needs voice extras`]))
+  });
   fill('music', O.music); fill('captions', O.captions);
   $('handle').value = choice.handle || '';
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3
+
+- **Graceful voice fallback**: `voice: auto` no longer crashes if voice cloning extras are missing; smoothly falls back to computer voice.
+- **Pipx-aware hints**: error messages, CLI doctor, and web UI show `pipx inject cardbox-video "cardbox-video[voice]"` when running in a pipx environment.
+- **Clearer UI options**: dropdown and voicebox clearly indicate whether voice extras are installed.
+
 ## 0.1.2
 
 - **Voice studio bug fixes**: fix consent checkbox reset loop and enable recording once ticked.

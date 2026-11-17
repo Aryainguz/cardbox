@@ -12,8 +12,10 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import os
 import re
 import shutil
+import sys
 import threading
 import time
 import traceback
@@ -229,8 +231,10 @@ class Handler(BaseHTTPRequestHandler):
                 from .voice.engines import has_voice_stack
 
                 stack = has_voice_stack()
+                is_pipx = "pipx" in sys.executable or "pipx" in os.environ.get("VIRTUAL_ENV", "")
                 return self._json({"voices": voices(), "reels": reels(), "options": options(),
-                                   "cloning": bool(stack.get("chatterbox")), "home": str(home())})
+                                   "cloning": bool(stack.get("chatterbox")), "is_pipx": is_pipx,
+                                   "home": str(home())})
             if parts[:2] == ["api", "reels"] and len(parts) == 3:
                 return self._json(reel_info(parts[2]))
             if parts[:2] == ["api", "reels"] and len(parts) == 5 and parts[3] == "preview":
