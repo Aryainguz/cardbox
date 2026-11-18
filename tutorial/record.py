@@ -7,7 +7,7 @@ preparing the recording (with your home folder shown as ~).
 usage:
     python tutorial/record.py --voice me [--voice-home ~/Cardbox] [--out tutorial/out]
 
-Needs the voice stack for the narration (`cardbox-video[voice]`, or CARDBOX_VOICE_PYTHON), Google Chrome, and
+Needs the voice stack for the narration (included in cardbox-video, or CARDBOX_VOICE_PYTHON), Google Chrome, and
 Playwright's screen-recording encoder: `python -m playwright install ffmpeg`.
 Output: tutorial/out/cardbox-tutorial.mp4 (1920x1080).
 """
