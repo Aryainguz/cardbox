@@ -1,0 +1,28 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.Aryainguz/cardbox",
+  "description": "Plain text to narrated, captioned video in your own cloned voice. Runs locally, no API keys.",
+  "repository": {
+    "url": "https://github.com/Aryainguz/cardbox",
+    "source": "github"
+  },
+  "websiteUrl": "https://aryainguz.github.io/cardbox",
+  "version": "0.1.6",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "cardbox-video",
+      "version": "0.1.6",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp"
+        }
+      ]
+    }
+  ]
+}

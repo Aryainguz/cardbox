@@ -19,9 +19,10 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Aryainguz/cardbox/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/Aryainguz/cardbox?style=flat&color=black"></a>
+  <a href="https://pypi.org/project/cardbox-video/"><img alt="PyPI" src="https://img.shields.io/pypi/v/cardbox-video?color=black"></a>
+  <a href="https://pypi.org/project/cardbox-video/"><img alt="downloads" src="https://img.shields.io/pypi/dm/cardbox-video?color=black"></a>
   <img alt="license" src="https://img.shields.io/badge/license-MIT-black">
-  <img alt="python" src="https://img.shields.io/badge/python-3.10%2B-black">
-  <img alt="go" src="https://img.shields.io/badge/go-1.26%2B-black">
   <img alt="mcp" src="https://img.shields.io/badge/MCP-server-black">
 </p>
 
@@ -30,6 +31,10 @@
 <p align="center"><img src="https://aryainguz.github.io/cardbox/media/demo.gif" alt="The cardbox app: a plain-text script becomes a finished video" width="860"></p>
 
 <p align="center"><b><a href="https://aryainguz.github.io/cardbox">Watch the 80-second explainer</a></b>: made with cardbox, narrated in my cloned voice.</p>
+
+<p align="center">If cardbox saves you an evening, a ⭐ helps other people find it.</p>
+
+<!-- mcp-name: io.github.Aryainguz/cardbox -->
 
 ## No paid AI needed
 
