@@ -339,9 +339,9 @@ SCENES.cards = (t, p) => film(t, () => {
       x.setLineDash([3200 * ok, 4000]); x.stroke(); x.restore(); });
     pill(c.tag || 'FIND THE BUG', X0 + 34, Y0 + 82, C.blue, 1);
     // timer ring
-    const left = Math.max(0, (p.seconds || 30) - Math.floor((t - s) * 4)), tr = 38, tcx = X0 + Wc - 70, tcy = Y0 + 62;
+    const total = p.seconds || 30, left = clamp(total - Math.floor(Math.max(0, t - s) * 4), 0, total), tr = 38, tcx = X0 + Wc - 70, tcy = Y0 + 62;
     x.lineWidth = 7; x.strokeStyle = T.line; x.beginPath(); x.arc(tcx, tcy, tr, 0, 7); x.stroke();
-    x.strokeStyle = ok > 0 ? C.green : C.amber; x.beginPath(); x.arc(tcx, tcy, tr, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left / (p.seconds || 30)); x.stroke();
+    x.strokeStyle = ok > 0 ? C.green : C.amber; x.beginPath(); x.arc(tcx, tcy, tr, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left / total); x.stroke();
     txt(String(left), tcx, tcy + 11, 30, C.text, 700, 'center');
     let y = Y0 + 160;
     wrap(c.question, Wc - 80, 38, 600).slice(0, 3).forEach((ln) => { txt(ln, X0 + 40, y, 38, C.text, 600); y += 50; });
