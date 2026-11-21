@@ -177,10 +177,18 @@ SCENES.chat = (t, p) => film(t, () => {
   x.fillStyle = T.line; x.fillRect(X0, 470, W0, 2);
   let y = 520;
   msgs.forEach((m, i) => {
-    const t0 = when(m.on, i, msgs.length), user = m.from === 'user';
+    const t0 = when(m.on, i, msgs.length), user = m.from === 'user' || m.from === 'you';
+    const named = !user && m.from && m.from !== 'ai', pal = [C.amber, C.blue, C.violet, C.green, C.red];
+    const tint = named ? ((p.colors || {})[m.from] || pal[[...m.from].reduce((h, ch) => h + ch.charCodeAt(0), 0) % pal.length]) : null;
     if (t < t0 - (user ? 0 : 0.6)) return;
-    const lines = wrap(m.text, 640, 36), bh = lines.length * 48 + 36, bw = Math.max(...lines.map((l) => x.measureText(l).width)) + 56;
-    const bx = user ? X0 + W0 - 36 - bw : X0 + 36, a = rise(t, t0, 0.3);
+    const lines = wrap(m.text, named ? 580 : 640, 36), bh = lines.length * 48 + 36, bw = Math.max(...lines.map((l) => x.measureText(l).width)) + 56;
+    const bx = user ? X0 + W0 - 36 - bw : X0 + 36 + (named ? 76 : 0), a = rise(t, t0, 0.3);
+    if (named && t >= t0 - 0.6) {  // monogram avatar and name, in the person's color
+      x.globalAlpha = t < t0 ? 0.6 : a; x.beginPath(); x.arc(X0 + 66, y + 30, 28, 0, 7); x.fillStyle = tint; x.fill();
+      txt(m.from[0].toUpperCase(), X0 + 66, y + 42, 32, C.bg, 800, 'center'); x.globalAlpha = 1;
+      if (t >= t0) { x.globalAlpha = a; txt(m.from, bx + 4, y - 10, 26, tint, 700); x.globalAlpha = 1; }
+      if (t >= t0) y += 8;
+    }
     if (!user && t < t0) {  // typing dots before the assistant answers
       rrect(bx, y, 140, 70, 26); x.fillStyle = LIGHT ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.07)'; x.fill();
       for (let d = 0; d < 3; d++) { x.globalAlpha = 0.35 + 0.65 * Math.abs(Math.sin(t * 5 + d)); x.beginPath(); x.arc(bx + 42 + d * 28, y + 35, 8, 0, 7); x.fillStyle = C.mute; x.fill(); }
@@ -264,4 +272,157 @@ SCENES.formats = (t, p) => film(t, () => {
   const ratio = cur[0] + ':' + cur[1];
   txt(ratio, 540, Math.min(fy + fh + 80, 1190), 60, C.accent, 800, 'center');
   txt(labels[k], 540, Math.min(fy + fh + 135, 1250), 38, C.text, 700, 'center');
+});
+
+// alert: an incident. The screen pulses red, a push notification slides down, and a latency chart
+// spikes (with a glitch) when the spike is cued. Sized to read in the top half too (hook backgrounds).
+// params: app, channel, title, body, metric {label, from, to, unit}, on
+SCENES.alert = (t, p) => film(t, () => {
+  const t0 = when(p.on, 0, 1), spike = t0 + 0.9, m = p.metric || { label: 'p95 latency', from: 80, to: 2400, unit: 'ms' };
+  const pulse = 0.5 + 0.5 * Math.sin(t * 5);
+  const g = x.createRadialGradient(540, 420, 40, 540, 420, 900);
+  g.addColorStop(0, 'rgba(255,72,72,' + (0.10 + 0.10 * pulse * rise(t, spike, 0.3)) + ')'); g.addColorStop(1, 'rgba(255,72,72,0)');
+  x.fillStyle = g; x.fillRect(-200, 0, 1480, 1400);
+  // the notification
+  const ny = 215 + (1 - rise(t, t0, 0.55)) * -340;  // below the handle line
+  glow('rgba(0,0,0,0.6)', 40, () => { rrect(70, ny, 940, 180, 36); x.fillStyle = 'rgba(28,28,34,0.94)'; x.fill(); });
+  rrect(70, ny, 940, 180, 36); x.strokeStyle = 'rgba(255,255,255,0.10)'; x.lineWidth = 2; x.stroke();
+  rrect(104, ny + 34, 64, 64, 16); x.fillStyle = C.red; x.fill(); ic('bell-ring', 136, ny + 66, 38, '#fff');
+  txt((p.app || 'Orbit').toUpperCase() + '  ·  ' + (p.channel || '#alerts'), 192, ny + 60, 26, C.mute, 600);
+  txt('now', 976, ny + 60, 26, C.mute, 600, 'right');
+  txt(p.title || 'Prod is down', 192, ny + 108, fit(p.title || 'Prod is down', 780, 40), C.text, 700);
+  txt(p.body || 'p95 latency is climbing. Can you take a look?', 192, ny + 150, fit(p.body || '', 780, 30, 500), C.mute, 500);
+  // the chart
+  const cx0 = 70, cy0 = 430, cw = 940, ch = 340, a = rise(t, t0 + 0.3, 0.5);
+  if (a > 0) {
+    x.globalAlpha = a;
+    rrect(cx0, cy0, cw, ch, 30); x.fillStyle = 'rgba(20,20,24,0.9)'; x.fill(); x.strokeStyle = T.line; x.lineWidth = 2; x.stroke();
+    txt(m.label, cx0 + 34, cy0 + 56, 30, C.mute, 600);
+    const k = clamp((t - spike) / 1.2), e = ease(k), val = Math.round(m.from + (m.to - m.from) * e);
+    const hot = k > 0.05, col = hot ? C.red : C.green;
+    glow(hot ? C.red : 'rgba(0,0,0,0)', 26, () => txt(val.toLocaleString('en-US') + ' ' + (m.unit || ''), cx0 + cw - 34, cy0 + 70, 64, hot ? C.red : C.text, 800, 'right'));
+    x.beginPath();
+    const pts = 70, sx = cx0 + 34, sw = cw - 68, base = cy0 + ch - 60;
+    for (let i = 0; i <= pts; i++) {
+      const u = i / pts, noise = Math.sin(i * 1.7 + t * 3) * 6 + Math.sin(i * 0.43) * 4;
+      const rise_ = u > 0.62 ? Math.pow((u - 0.62) / 0.38, 2) * (ch - 150) * e : 0;
+      const px = sx + u * sw, py = base - 30 - noise - rise_;
+      i ? x.lineTo(px, py) : x.moveTo(px, py);
+    }
+    glow(col, 22, () => { x.strokeStyle = col; x.lineWidth = 6; x.lineJoin = 'round'; x.stroke(); });
+    if (hot && Math.floor(t * 3) % 2 === 0) pill('INCIDENT', cx0 + 34, cy0 + 150, C.red, 1);
+    x.globalAlpha = 1;
+    // glitch: a few displaced bands of the frame for a moment after the spike
+    const gk = 1 - Math.abs(t - spike - 0.15) / 0.25;
+    if (gk > 0) { const r = rng(Math.floor(t * 30)); for (let i = 0; i < 7; i++) { const by = 100 + r() * 700, bh = 8 + r() * 40;
+      x.drawImage(cv, 0, by, cv.width, bh, (r() - 0.5) * 90 * gk, by, cv.width, bh); } }
+  }
+});
+
+// cards: a challenge-card stack. Each card shows a tag, a question and code; a 30-second timer runs,
+// the answer line is tapped, the border sweeps green with a check, and the card flies off for the next.
+// params: cards [{tag, question, code: [lines], answer (line index), note, on}], seconds
+SCENES.cards = (t, p) => film(t, () => {
+  const cards = p.cards || [], n = cards.length, X0 = 90, Y0 = 400, Wc = 900, Hc = 780;
+  const starts = cards.map((c, i) => when(c.on, i, n));
+  let k = 0; starts.forEach((s, i) => { if (t >= s) k = i; });
+  for (let g = 2; g >= 1; g--) { rrect(X0 + g * 18, Y0 - g * 22, Wc - g * 36, Hc, 34); x.fillStyle = 'rgba(28,28,34,' + (0.55 - g * 0.15) + ')'; x.fill(); }
+  const draw = (c, i, fly) => {
+    const s = starts[i], next = i + 1 < n ? starts[i + 1] : 1e9, span = Math.min(next, CONFIG.dur) - s;
+    const tap = s + span * 0.55, ok = rise(t, tap + 0.15, 0.45);
+    x.save();
+    if (fly > 0) { x.translate(540 - 900 * fly, 790 + 120 * fly); x.rotate(-0.35 * fly); x.translate(-540, -790); x.globalAlpha = 1 - fly; }
+    else { const inA = rise(t, s, 0.35); x.globalAlpha = inA; x.translate(0, (1 - inA) * 40); }
+    glow('rgba(0,0,0,0.6)', 40, () => { rrect(X0, Y0, Wc, Hc, 34); x.fillStyle = '#141418'; x.fill(); });
+    rrect(X0, Y0, Wc, Hc, 34); x.strokeStyle = T.line; x.lineWidth = 2; x.stroke();
+    if (ok > 0) glow(C.green, 30, () => { x.save(); rrect(X0, Y0, Wc, Hc, 34); x.lineWidth = 5; x.strokeStyle = C.green;
+      x.setLineDash([3200 * ok, 4000]); x.stroke(); x.restore(); });
+    pill(c.tag || 'FIND THE BUG', X0 + 34, Y0 + 82, C.blue, 1);
+    // timer ring
+    const left = Math.max(0, (p.seconds || 30) - Math.floor((t - s) * 4)), tr = 38, tcx = X0 + Wc - 70, tcy = Y0 + 62;
+    x.lineWidth = 7; x.strokeStyle = T.line; x.beginPath(); x.arc(tcx, tcy, tr, 0, 7); x.stroke();
+    x.strokeStyle = ok > 0 ? C.green : C.amber; x.beginPath(); x.arc(tcx, tcy, tr, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left / (p.seconds || 30)); x.stroke();
+    txt(String(left), tcx, tcy + 11, 30, C.text, 700, 'center');
+    let y = Y0 + 160;
+    wrap(c.question, Wc - 80, 38, 600).slice(0, 3).forEach((ln) => { txt(ln, X0 + 40, y, 38, C.text, 600); y += 50; });
+    y += 20;
+    (c.code || []).forEach((ln, j) => {
+      const bad = j === c.answer, tapped = t > tap;
+      if (bad && tapped) { rrect(X0 + 24, y - 40, Wc - 48, 58, 12); x.fillStyle = ok > 0 ? 'rgba(52,211,153,0.16)' : 'rgba(255,92,92,0.18)'; x.fill(); }
+      txt(String(j + 1), X0 + 50, y, 26, C.mute, 400, 'right', 'Mono');
+      txt(ln, X0 + 76, y, fit(ln, Wc - 140, 30, 400), '#E4E4E9', 400, 'left', 'Mono');
+      if (bad && Math.abs(t - tap) < 0.35) { const r = 20 + 60 * clamp((t - tap) / 0.35); x.strokeStyle = 'rgba(255,225,77,' + (1 - clamp((t - tap) / 0.35)) + ')';
+        x.lineWidth = 5; x.beginPath(); x.arc(X0 + 300, y - 10, r, 0, 7); x.stroke(); }
+      y += 62;
+    });
+    if (ok > 0) {
+      const cy = Y0 + Hc - 90;
+      glow(C.green, 20, () => { x.beginPath(); x.arc(X0 + 70, cy, 32, 0, 7); x.fillStyle = C.green; x.fill(); });
+      x.strokeStyle = '#0A0A0C'; x.lineWidth = 7; x.lineCap = 'round'; x.beginPath();
+      const d = clamp(ok * 1.6); x.moveTo(X0 + 55, cy); x.lineTo(X0 + 55 + 10 * Math.min(1, d * 2), cy + 10 * Math.min(1, d * 2));
+      if (d > 0.5) x.lineTo(X0 + 65 + 20 * (d - 0.5) * 2, cy + 10 - 22 * (d - 0.5) * 2); x.stroke();
+      x.globalAlpha *= ok; txt(c.note || 'Correct.', X0 + 120, cy + 12, fit(c.note || 'Correct.', Wc - 170, 32, 600), C.text, 600);
+    }
+    x.restore();
+  };
+  if (k > 0) { const fly = rise(t, starts[k], 0.4); if (fly < 1) draw(cards[k - 1], k - 1, fly); }
+  if (n) draw(cards[k], k, 0);
+});
+
+// rings: activity rings closing one after another, then a row of streak days lighting up.
+// params: rings [{label, value (0..1), color}], days, streak (label), on
+SCENES.rings = (t, p) => film(t, () => {
+  const rings = p.rings || [{ label: 'Solve', value: 1, color: C.blue }, { label: 'Design', value: 1, color: C.violet }, { label: 'Recall', value: 1, color: C.green }];
+  const t0 = when(p.on, 0, 1), cx = 540, cy = 690, radii = [260, 196, 132];
+  let all = true;
+  rings.forEach((r, i) => {
+    const k = rise(t, t0 + i * 0.45, 1.0) * (r.value ?? 1), col = r.color || [C.blue, C.violet, C.green][i % 3];
+    if (k < 0.999) all = false;
+    x.lineCap = 'round'; x.lineWidth = 50; x.strokeStyle = T.line; x.beginPath(); x.arc(cx, cy, radii[i], 0, 7); x.stroke();
+    glow(col, 26, () => { x.strokeStyle = col; x.beginPath(); x.arc(cx, cy, radii[i], -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.max(0.001, k)); x.stroke(); });
+    const ly = 1030 + i * 52;
+    rrect(250, ly - 26, 30, 30, 9); x.fillStyle = col; x.fill(); txt(r.label, 300, ly, 36, C.text, 600);
+    txt(Math.round(k * 100) + '%', 830, ly, 36, col, 700, 'right');
+  });
+  if (all) { const a = rise(t, t0 + rings.length * 0.45 + 1, 0.4); pill(p.closed || 'Rings closed', cx, cy + 22, C.green, a, 'center'); }
+  const days = p.days || 7, dt0 = t0 + 0.6;
+  for (let d = 0; d < days; d++) {
+    const on = rise(t, dt0 + d * 0.18, 0.25), dx = 540 + (d - (days - 1) / 2) * 92;
+    glow(on > 0.5 ? C.amber : 'rgba(0,0,0,0)', 18, () => { x.beginPath(); x.arc(dx, 1240, 26, 0, 7); x.fillStyle = on > 0.5 ? C.amber : T.line; x.fill(); });
+  }
+  if (p.streak) txt(p.streak, 540, 1300, 30, C.amber, 700, 'center');
+});
+
+// appreveal: an app icon pops in with a light sweep, then the name, a tagline and a badge.
+// params: image (the icon), name, tagline, badge, on
+SCENES.appreveal = (t, p) => film(t, () => {
+  const t0 = when(p.on, 0, 1), k = clamp((t - t0) / 0.6), s = k <= 0 ? 0 : 1 + 0.18 * Math.sin(k * Math.PI) * (1 - k) + (ease(k) - 1) * 0.6 + 0.6 * ease(k) - 0.6 + 0.0;
+  const size = 320, cx = 540, cy = 620, scale = Math.max(0, ease(k) * (1 + 0.12 * Math.sin(Math.min(1, k) * Math.PI)));
+  // rays and sparks
+  const r = rng(3), ra = rise(t, t0 + 0.2, 0.6);
+  for (let i = 0; i < 26; i++) { const ang = r() * Math.PI * 2, d = 220 + r() * 260 * ra, sz = 2 + r() * 5;
+    x.globalAlpha = ra * (0.25 + 0.6 * r()) * (0.6 + 0.4 * Math.sin(t * 3 + i)); x.fillStyle = i % 3 ? C.accent : '#fff';
+    x.beginPath(); x.arc(cx + Math.cos(ang) * d, cy + Math.sin(ang) * d, sz, 0, 7); x.fill(); }
+  x.globalAlpha = 1;
+  if (scale > 0) {
+    x.save(); x.translate(cx, cy); x.scale(scale, scale);
+    glow(C.accent, 80, () => { rrect(-size / 2, -size / 2, size, size, 72); x.fillStyle = '#000'; x.fill(); });
+    x.save(); rrect(-size / 2, -size / 2, size, size, 72); x.clip();
+    const im = PH[p.image]; if (im && im.complete) x.drawImage(im, -size / 2, -size / 2, size, size);
+    const sweep = clamp((t - t0 - 0.5) / 0.8);
+    if (sweep > 0 && sweep < 1) { const sx = -size + sweep * size * 2.2; const g = x.createLinearGradient(sx, -size / 2, sx + 120, size / 2);
+      g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(255,255,255,0.45)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+      x.fillStyle = g; x.fillRect(-size / 2, -size / 2, size, size); }
+    x.restore(); x.restore();
+  }
+  const na = rise(t, t0 + 0.55, 0.45);
+  if (na > 0) { x.globalAlpha = na; txt(p.name || 'App', cx, 920 + (1 - na) * 30, fit(p.name || 'App', 900, 140, 800), C.text, 800, 'center');
+    if (p.tagline) txt(p.tagline, cx, 990, fit(p.tagline, 880, 40, 600), C.mute, 600, 'center'); x.globalAlpha = 1; }
+  const ba = rise(t, t0 + 0.9, 0.45);
+  if (ba > 0 && p.badge) {
+    x.globalAlpha = ba; x.font = '700 40px ' + FONT; const bw = x.measureText(p.badge).width + 130, bx = cx - bw / 2, by = 1060;
+    glow(C.accent, 30, () => { rrect(bx, by, bw, 92, 46); x.fillStyle = C.accent; x.fill(); });
+    x.beginPath(); x.moveTo(bx + 52, by + 28); x.lineTo(bx + 52, by + 64); x.lineTo(bx + 82, by + 46); x.closePath(); x.fillStyle = C.bg; x.fill();
+    txt(p.badge, bx + 100, by + 60, 40, C.bg, 700); x.globalAlpha = 1;
+  }
 });

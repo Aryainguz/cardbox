@@ -37,10 +37,19 @@ CATALOG = {
     "flow": "A vertical chain of steps with packets moving between them. params: nodes [{icon,label,sub?,on?,color?}], bad",
     "grid": "k of n icons lighting up (e.g. '1 in 10'). params: n, k, cols, icon, result {text,on}",
     "logo": "A logo reveal: an isometric box assembles, then a name and tagline. params: name, tagline, on",
-    "chat": "A chat with an AI assistant; typing dots before each answer. params: title, messages [{from: user|ai, text, on}]",
+    "chat": "A chat with typing dots before each reply. params: title, messages [{from: user|ai|<name>, text, on}], "
+    "colors {name: color}. Named senders get a monogram avatar.",
     "script": "A text script whose paragraphs light up and turn into video frames. params: title, paragraphs [text], on [cues]",
     "voice": "A waveform and live transcript; one misheard word is caught and corrected. params: text, wrong {index, heard}, on",
     "formats": "One frame morphing between 9:16, 16:9 and 1:1. params: labels [3 strings], on [3 cues]",
+    "alert": "An incident: red pulse, a push notification slides in, a latency chart spikes and glitches. params: app, channel, "
+    "title, body, metric {label, from, to, unit}, on",
+    "cards": "A challenge-card stack: timer ring, the answer line is tapped, a green sweep and check, then the next card. "
+    "params: cards [{tag, question, code: [lines], answer, note, on}], seconds",
+    "rings": "Activity rings closing one by one, then streak days lighting up. params: rings [{label, value, color}], days, "
+    "streak, closed, on",
+    "appreveal": "An app icon pops in with a light sweep, then its name, a tagline and a badge. params: image, name, tagline, "
+    "badge, on",
 }
 
 
