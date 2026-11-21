@@ -3,6 +3,7 @@
     cardbox                               open the app in your browser (the easiest way)
 
     cardbox make script.txt --render      plain text in (one paragraph per beat), video out
+    cardbox repo owner/name --render    any GitHub repo → a launch video (or `cardbox repo .`)
     cardbox new my-reel                 start a YAML spec from the template (full control)
     cardbox render my-reel              render it (or a path to a spec file)
     cardbox preview my-reel 2           a still of beat 2
@@ -66,6 +67,26 @@ def _make(a: argparse.Namespace) -> None:
         print(f"\n{r.video}  ({r.seconds:.1f}s)\ncaption: {r.caption}")
     else:
         print(f"Preview: cardbox preview {slug(name)} 0    Render: cardbox render {slug(name)}")
+
+
+def _repo(a: argparse.Namespace) -> None:
+    from .repo import build, fetch, script
+
+    if a.print:
+        print(script(fetch(a.repo)), end="")
+        return
+    opts = {k: v for k, v in {"format": a.format, "theme": a.theme, "voice": a.voice, "handle": a.handle,
+                              "music": a.music}.items() if v}
+    repo, text, d = build(a.repo, a.name or "", credit=not a.no_credit, **opts)
+    print(text)
+    print(f"{repo.slug} → {d / 'reel.yaml'}  (edit {d / 'script.txt'} and run `cardbox make` on it to change the words)")
+    if a.render:
+        from .render import render
+
+        r = render(d.name)
+        print(f"\n{r.video}  ({r.seconds:.1f}s)\ncaption: {r.caption}")
+    else:
+        print(f"Preview: cardbox preview {d.name} 0    Render: cardbox render {d.name}")
 
 
 def _render(a: argparse.Namespace) -> None:
@@ -187,6 +208,19 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--captions")
     p.add_argument("--render", action="store_true", help="render right away")
     p.set_defaults(fn=_make)
+
+    p = sub.add_parser("repo", help="any GitHub repo (owner/name, a link, or a local folder) → a launch video")
+    p.add_argument("repo", help="owner/name, https://github.com/owner/name, or a local folder such as .")
+    p.add_argument("--name", help="video name (default: the repo's name)")
+    p.add_argument("--format", help="vertical | landscape | square")
+    p.add_argument("--theme")
+    p.add_argument("--voice", help="your voice name, system, or none")
+    p.add_argument("--handle")
+    p.add_argument("--music")
+    p.add_argument("--no-credit", action="store_true", help="leave the 'Made with cardbox' line out of the caption")
+    p.add_argument("--print", action="store_true", help="only print the script, save nothing")
+    p.add_argument("--render", action="store_true", help="render right away")
+    p.set_defaults(fn=_repo)
 
     p = sub.add_parser("new", help="start a YAML spec from the template (full control)")
     p.add_argument("name")
